@@ -1,0 +1,12 @@
+# Editor / tooling
+.claude/
+.DS_Store
+Thumbs.db
+
+# Node (in case tooling is added later)
+node_modules/
+npm-debug.log*
+
+# Local env / secrets
+.env
+.env.local

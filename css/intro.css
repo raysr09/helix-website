@@ -1,0 +1,52 @@
+/* ===========================================================
+   intro.css — The "warp-in" fly-through-space intro
+   =========================================================== */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1.1s ease;
+}
+.intro.done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.warp-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.skip-intro {
+  position: absolute;
+  right: 28px;
+  bottom: 26px;
+  z-index: 51;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(207, 214, 230, 0.7);
+  background: rgba(8, 10, 26, 0.4);
+  border: 1px solid rgba(150, 170, 220, 0.25);
+  border-radius: 24px;
+  padding: 9px 20px;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+.skip-intro:hover {
+  color: #fff;
+  border-color: rgba(150, 190, 255, 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* intro.js detects this and shortens the sequence dramatically */
+}

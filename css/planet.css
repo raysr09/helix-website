@@ -1,0 +1,173 @@
+/* ===========================================================
+   planet.css — Shared styles for every discipline page.
+   The accent colour is set per-page via the --accent variable
+   on the <body> tag (e.g. <body style="--accent:#e23b4e">).
+   =========================================================== */
+
+:root {
+  --space-black: #05050f;
+  --text-soft: #cfd6e6;
+  --text-faint: #7a83a0;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-ui: "Space Grotesk", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  --accent: #8fb4ff; /* overridden per page */
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-ui);
+  color: var(--text-soft);
+  background:
+    radial-gradient(ellipse 70% 60% at 50% -10%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 110%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    var(--space-black);
+  opacity: 0;
+  animation: page-fade-in 1s ease forwards;
+}
+@keyframes page-fade-in { to { opacity: 1; } }
+
+/* tiny static starfield via CSS, so planet pages need no JS */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+    radial-gradient(1px 1px at 70% 60%, #fff, transparent),
+    radial-gradient(1px 1px at 40% 80%, #cdd, transparent),
+    radial-gradient(2px 2px at 85% 25%, #fff, transparent),
+    radial-gradient(1px 1px at 55% 15%, #fff, transparent),
+    radial-gradient(1px 1px at 10% 70%, #cdd, transparent);
+  opacity: 0.5;
+}
+
+/* ---------- Return-to-galaxy button ---------- */
+.return-link {
+  position: fixed;
+  top: 26px;
+  left: 26px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(150, 170, 220, 0.2);
+  background: rgba(8, 10, 26, 0.5);
+  backdrop-filter: blur(4px);
+  transition: border-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+.return-link:hover {
+  color: #fff;
+  border-color: var(--accent);
+  transform: translateX(-3px);
+}
+
+/* ---------- Header ---------- */
+.planet-header {
+  position: relative;
+  text-align: center;
+  padding: 130px 24px 50px;
+}
+.planet-header .glyph {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, var(--accent) 55%, transparent 100%);
+  box-shadow: 0 0 40px var(--accent), 0 0 90px color-mix(in srgb, var(--accent) 50%, transparent);
+  animation: glyph-float 6s ease-in-out infinite;
+}
+@keyframes glyph-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.planet-header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.6rem, 7vw, 4.6rem);
+  letter-spacing: 0.16em;
+  text-indent: 0.16em;
+  color: #fff;
+}
+.planet-header .tagline {
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.planet-header .intro {
+  max-width: 620px;
+  margin: 26px auto 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.7;
+  color: var(--text-soft);
+}
+
+/* ---------- Project grid ---------- */
+.projects {
+  max-width: 1080px;
+  margin: 30px auto 90px;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+.project-card {
+  background: rgba(12, 14, 32, 0.6);
+  border: 1px solid rgba(150, 170, 220, 0.14);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.project-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
+  box-shadow: 0 14px 40px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.project-thumb {
+  aspect-ratio: 4 / 3;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 30%, #0c0e20), #0c0e20);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--accent) 70%, #fff);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+}
+.project-body { padding: 18px 20px 22px; }
+.project-body h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: #fff;
+}
+.project-body p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-faint);
+}
+
+/* placeholder note for the user */
+.placeholder-note {
+  max-width: 1080px;
+  margin: 0 auto 60px;
+  padding: 16px 24px;
+  text-align: center;
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}

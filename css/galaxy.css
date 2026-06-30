@@ -1,0 +1,303 @@
+/* ===========================================================
+   galaxy.css — The Galaxy main page
+   Deep, cinematic space. Near-black with nebula depth.
+   =========================================================== */
+
+:root {
+  --space-black: #05050f;
+  --space-indigo: #0c0d24;
+  --text-soft: #cfd6e6;
+  --text-faint: #7a83a0;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-ui: "Space Grotesk", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--space-black);
+  color: var(--text-soft);
+  font-family: var(--font-ui);
+  overflow: hidden;
+}
+
+/* ---------- The galaxy stage ---------- */
+.galaxy {
+  position: fixed;
+  inset: 0;
+  /* layered nebula clouds for depth */
+  background:
+    radial-gradient(ellipse 60% 50% at 25% 30%, rgba(91, 60, 160, 0.18), transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 70%, rgba(20, 110, 130, 0.16), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 60% 20%, rgba(120, 40, 90, 0.10), transparent 65%),
+    var(--space-black);
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.galaxy.revealed { opacity: 1; }
+
+/* starfield canvas */
+.star-canvas,
+.warp-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* live-viewer ships layer */
+.ship-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ---------- The orbital system ---------- */
+.system {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  z-index: 2;
+}
+
+/* warm anchoring glow behind Helix — the "sun" */
+.sun-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 520px;
+  height: 520px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 196, 120, 0.16), rgba(255, 150, 90, 0.05) 40%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: sun-breathe 9s ease-in-out infinite;
+}
+@keyframes sun-breathe {
+  0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.06); }
+}
+
+/* Helix focal point */
+.helix {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 4;
+}
+.helix-img {
+  width: 150px;
+  height: 150px;
+  filter: drop-shadow(0 0 22px rgba(120, 180, 255, 0.65));
+  animation: helix-spin 26s linear infinite, helix-pulse 6s ease-in-out infinite;
+}
+@keyframes helix-spin  { to { transform: rotate(360deg); } }
+@keyframes helix-pulse {
+  0%, 100% { filter: drop-shadow(0 0 22px rgba(120, 180, 255, 0.55)); }
+  50%      { filter: drop-shadow(0 0 38px rgba(150, 200, 255, 0.95)); }
+}
+.helix-word {
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: 0.55em;
+  text-indent: 0.55em; /* compensate letter-spacing for centring */
+  color: #eaf1ff;
+  text-shadow: 0 0 18px rgba(120, 180, 255, 0.55);
+}
+
+/* ---------- Orbit rings (injected by galaxy.js) ---------- */
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(150, 170, 220, 0.10);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 30px rgba(120, 150, 220, 0.04) inset;
+}
+
+/* a rotating arm that carries one planet around the centre */
+.orbit-arm {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  animation: orbit-rotate linear infinite;
+}
+@keyframes orbit-rotate { to { transform: rotate(360deg); } }
+
+/* the planet body */
+.planet {
+  position: absolute;
+  border-radius: 50%;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  /* counter-rotates so the planet itself doesn't visibly spin */
+  animation: orbit-counter linear infinite;
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+@keyframes orbit-counter { to { transform: translate(-50%, -50%) rotate(-360deg); } }
+
+.planet::after { /* subtle surface sheen */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.45), transparent 55%);
+}
+.planet:hover { filter: brightness(1.35) saturate(1.2); }
+
+/* ---------- Floating hover label ---------- */
+.planet-label {
+  position: fixed;
+  z-index: 6;
+  pointer-events: none;
+  transform: translate(-50%, -140%);
+  text-align: center;
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 10px;
+  background: rgba(8, 10, 26, 0.72);
+  border: 1px solid rgba(150, 170, 220, 0.18);
+  backdrop-filter: blur(4px);
+  animation: label-in 0.25s ease;
+}
+@keyframes label-in { from { opacity: 0; transform: translate(-50%, -120%); } }
+.planet-label-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.12em;
+  color: #fff;
+}
+.planet-label-tagline {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* ---------- The Guide link ---------- */
+.guide-link {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text-soft);
+  padding: 10px 16px;
+  border-radius: 30px;
+  border: 1px solid rgba(150, 170, 220, 0.18);
+  background: rgba(8, 10, 26, 0.45);
+  backdrop-filter: blur(4px);
+  transition: border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+.guide-link:hover { border-color: rgba(150,190,255,0.6); color: #fff; transform: translateY(-2px); }
+.guide-icon {
+  font-size: 1.4rem;
+  animation: guide-float 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(150, 190, 255, 0.6));
+}
+@keyframes guide-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.guide-text { font-size: 0.85rem; letter-spacing: 0.18em; text-transform: uppercase; }
+
+/* ---------- Presence readout ---------- */
+.presence-readout {
+  position: fixed;
+  left: 30px;
+  bottom: 30px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.presence-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #46e6a0;
+  box-shadow: 0 0 10px #46e6a0;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+/* ---------- Title text ---------- */
+.galaxy-intro-text {
+  position: fixed;
+  top: 38px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 5;
+  pointer-events: none;
+}
+.galaxy-intro-text h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 1.1rem;
+  letter-spacing: 0.7em;
+  text-indent: 0.7em;
+  color: rgba(234, 241, 255, 0.5);
+}
+.galaxy-intro-text p {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  color: var(--text-faint);
+}
+
+/* ---------- A live-viewer ship ---------- */
+.ship {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  transition: left 2.4s linear, top 2.4s linear;
+  will-change: left, top;
+}
+.ship svg { display: block; filter: drop-shadow(0 0 6px rgba(150, 200, 255, 0.8)); }
+.ship-trail {
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(150, 200, 255, 0.5);
+  pointer-events: none;
+  animation: trail-fade 1.6s ease forwards;
+}
+@keyframes trail-fade { to { opacity: 0; transform: scale(0.2); } }
+
+/* ---------- Smaller screens ---------- */
+@media (max-width: 760px) {
+  .helix-img { width: 110px; height: 110px; }
+  .helix-word { font-size: 1.2rem; letter-spacing: 0.4em; text-indent: 0.4em; }
+  .galaxy-intro-text p { display: none; }
+  .guide-text { display: none; }
+  /* galaxy.js scales orbits down on small screens via a CSS variable */
+}
+
+/* respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  .helix-img, .sun-glow, .orbit-arm, .planet, .guide-icon, .presence-dot { animation: none !important; }
+}
