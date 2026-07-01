@@ -63,32 +63,40 @@
   }
 
   // A full fantasy-dagger silhouette, traced as one continuous outline:
-  // diamond pommel -> tapered grip -> flared crossguard wings (through the
-  // guardLeft/guardRight stars) -> widening ricasso -> blade tapering to a
-  // sharp point (the tip star). All extra points here are purely decorative
-  // (not clickable) — they exist only to make the outline actually read as
-  // a dagger instead of a stick-figure cross.
-  function outlinePoints() {
-    return [
-      byId.pommel,                    // pommel tip
-      { x: 17.6, y: 16.8 },           // pommel, right bulge
-      { x: 16.6, y: 19.5 },           // grip neck, right
-      { x: 17,   y: 23 },             // grip meets guard, right
-      byId.guardRight,                // guard wing tip, right
-      { x: 18.5, y: 25.5 },           // ricasso, right
-      { x: 17.8, y: 27.5 },           // blade shoulder, right
-      { x: 17,   y: 32 },             // blade edge, right
-      { x: 16.4, y: 37 },             // blade edge near tip, right
-      byId.tip,                       // blade point
-      { x: 15.6, y: 37 },             // blade edge near tip, left
-      { x: 15,   y: 32 },             // blade edge, left
-      { x: 14.2, y: 27.5 },           // blade shoulder, left
-      { x: 13.5, y: 25.5 },           // ricasso, left
-      byId.guardLeft,                 // guard wing tip, left
-      { x: 15,   y: 23 },             // grip meets guard, left
-      { x: 15.4, y: 19.5 },           // grip neck, left
-      { x: 14.4, y: 16.8 },           // pommel, left bulge
-    ];
+  // diamond pommel -> tapered grip -> flared crossguard wings -> widening
+  // ricasso -> blade tapering to a sharp point.
+  //
+  // Each point is defined parametrically as { t, w }: `t` is how far along
+  // the pommel-to-tip spine it sits (0 = pommel, 1 = tip), and `w` is how
+  // far out from the spine it sits, as a multiple of the guard's own
+  // half-width (negative = left side). Deriving every point this way from
+  // the *actual measured* positions of the pommel/guard/tip stars — rather
+  // than from raw percentage-of-viewport coordinates — means the shape
+  // keeps its proportions no matter the window size or aspect ratio.
+  const OUTLINE_SPEC = [
+    { t: 0,     w: 0     },  // pommel tip
+    { t: 0.072, w: 0.32  },  // pommel, right bulge
+    { t: 0.18,  w: 0.12  },  // grip neck, right
+    { t: 0.32,  w: 0.20  },  // grip meets guard, right
+    { t: 0.36,  w: 1.0   },  // guard wing tip, right
+    { t: 0.42,  w: 0.50  },  // ricasso, right
+    { t: 0.50,  w: 0.36  },  // blade shoulder, right
+    { t: 0.68,  w: 0.20  },  // blade edge, right
+    { t: 0.88,  w: 0.08  },  // blade edge near tip, right
+    { t: 1.0,   w: 0     },  // blade point
+    { t: 0.88,  w: -0.08 },  // blade edge near tip, left
+    { t: 0.68,  w: -0.20 },  // blade edge, left
+    { t: 0.50,  w: -0.36 },  // blade shoulder, left
+    { t: 0.42,  w: -0.50 },  // ricasso, left
+    { t: 0.36,  w: -1.0  },  // guard wing tip, left
+    { t: 0.32,  w: -0.20 },  // grip meets guard, left
+    { t: 0.18,  w: -0.12 },  // grip neck, left
+    { t: 0.072, w: -0.32 },  // pommel, left bulge
+  ];
+
+  function center(el) {
+    const r = el.getBoundingClientRect();
+    return [r.left + r.width / 2, r.top + r.height / 2];
   }
 
   function reveal() {
@@ -100,12 +108,30 @@
     svg.setAttribute("height", window.innerHeight);
     document.body.appendChild(svg);
 
-    const px = (pt) => [(pt.x / 100) * window.innerWidth, (pt.y / 100) * window.innerHeight];
+    // Real, on-screen positions of the anchor stars.
+    const P = center(byId.pommel.el);
+    const L = center(byId.guardLeft.el);
+    const R = center(byId.guardRight.el);
+    const T = center(byId.tip.el);
+
+    // Unit vector along the spine (pommel -> tip) and a perpendicular unit
+    // vector for width — both derived from real geometry, so the shape's
+    // proportions can't be stretched by viewport width/height separately.
+    const axisX = T[0] - P[0], axisY = T[1] - P[1];
+    const axisLen = Math.hypot(axisX, axisY);
+    const ux = axisX / axisLen, uy = axisY / axisLen;
+    const perpX = -uy, perpY = ux;
+    const guardHalfWidth = Math.hypot(R[0] - L[0], R[1] - L[1]) / 2;
+
+    const pointAt = ({ t, w }) => [
+      P[0] + ux * axisLen * t + perpX * guardHalfWidth * w,
+      P[1] + uy * axisLen * t + perpY * guardHalfWidth * w,
+    ];
 
     // the dagger's outline, drawn as one continuous stroke
-    const d = outlinePoints()
-      .map((pt, i) => {
-        const [x, y] = px(pt);
+    const d = OUTLINE_SPEC
+      .map((spec, i) => {
+        const [x, y] = pointAt(spec);
         return `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
       })
       .join(" ") + " Z";
@@ -122,8 +148,8 @@
 
     // a thin fuller (centre ridge line) down the blade, drawn as a flourish
     // right after the outline finishes
-    const [cx1, cy1] = px(byId.guardCenter);
-    const [cx2, cy2] = px(byId.tip);
+    const [cx1, cy1] = pointAt({ t: 0.36, w: 0 }); // level with the guard
+    const [cx2, cy2] = T;
     const fullerLength = Math.hypot(cx2 - cx1, cy2 - cy1);
     const fullerDelay = outlineDuration + 0.1;
     const fullerDuration = 0.5;
