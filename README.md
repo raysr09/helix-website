@@ -8,12 +8,6 @@ to the Galaxy**, runs alongside it. Live visitors appear as tiny drifting ships.
 No frameworks, no build step — just HTML, CSS and JavaScript.
 
 ---
-Clone the repository and open `index.html` in your browser:
-
-```bash
-git clone https://github.com/raysr09/helix-website.git
-cd helix-website
-```
 
 ## Looking at the site on your own computer
 
@@ -103,5 +97,4 @@ netlify.toml        Hosting configuration
 ```
 
 ## Contributing
-Pull requests are welcome.
 Pull requests are welcome. Please open an issue first to discuss any significant changes.
