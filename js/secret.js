@@ -33,11 +33,6 @@
   // The secret click order (a visitor must click these, in this order).
   const SECRET_ORDER = ["pommel", "guardLeft", "guardRight", "guardCenter", "tip"];
 
-  // Two extra points (not clickable, purely decorative) used only to give
-  // the blade its taper — without these the reveal is just a plus-sign.
-  const SHOULDER_RIGHT = { x: 19, y: 30 };
-  const SHOULDER_LEFT = { x: 13, y: 30 };
-
   const SVG_NS = "http://www.w3.org/2000/svg";
   const byId = {};
   let progress = 0;
@@ -67,6 +62,35 @@
     }
   }
 
+  // A full fantasy-dagger silhouette, traced as one continuous outline:
+  // diamond pommel -> tapered grip -> flared crossguard wings (through the
+  // guardLeft/guardRight stars) -> widening ricasso -> blade tapering to a
+  // sharp point (the tip star). All extra points here are purely decorative
+  // (not clickable) — they exist only to make the outline actually read as
+  // a dagger instead of a stick-figure cross.
+  function outlinePoints() {
+    return [
+      byId.pommel,                    // pommel tip
+      { x: 17.6, y: 16.8 },           // pommel, right bulge
+      { x: 16.6, y: 19.5 },           // grip neck, right
+      { x: 17,   y: 23 },             // grip meets guard, right
+      byId.guardRight,                // guard wing tip, right
+      { x: 18.5, y: 25.5 },           // ricasso, right
+      { x: 17.8, y: 27.5 },           // blade shoulder, right
+      { x: 17,   y: 32 },             // blade edge, right
+      { x: 16.4, y: 37 },             // blade edge near tip, right
+      byId.tip,                       // blade point
+      { x: 15.6, y: 37 },             // blade edge near tip, left
+      { x: 15,   y: 32 },             // blade edge, left
+      { x: 14.2, y: 27.5 },           // blade shoulder, left
+      { x: 13.5, y: 25.5 },           // ricasso, left
+      byId.guardLeft,                 // guard wing tip, left
+      { x: 15,   y: 23 },             // grip meets guard, left
+      { x: 15.4, y: 19.5 },           // grip neck, left
+      { x: 14.4, y: 16.8 },           // pommel, left bulge
+    ];
+  }
+
   function reveal() {
     if (reduceMotion) { fadeAndGo(); return; }
 
@@ -77,48 +101,46 @@
     document.body.appendChild(svg);
 
     const px = (pt) => [(pt.x / 100) * window.innerWidth, (pt.y / 100) * window.innerHeight];
-    let delay = 0;
 
-    // grip (pommel -> guardCenter) and crossguard (guardLeft -> guardRight)
-    // are simple straight strokes, drawn first.
-    [
-      [byId.pommel, byId.guardCenter],
-      [byId.guardLeft, byId.guardRight],
-    ].forEach(([a, b]) => {
-      const [x1, y1] = px(a);
-      const [x2, y2] = px(b);
-      const length = Math.hypot(x2 - x1, y2 - y1);
-
-      const line = document.createElementNS(SVG_NS, "line");
-      line.setAttribute("x1", x1);
-      line.setAttribute("y1", y1);
-      line.setAttribute("x2", x2);
-      line.setAttribute("y2", y2);
-      line.setAttribute("class", "constellation-line");
-      line.style.strokeDasharray = length;
-      line.style.strokeDashoffset = length;
-      line.style.animation = `constellation-draw 0.4s ease forwards ${delay}s`;
-      svg.appendChild(line);
-      delay += 0.3;
-    });
-
-    // the blade itself: a tapered outline from the crossguard down to the
-    // tip, through two shoulder points — this is what actually reads as
-    // a dagger rather than a plus sign.
-    const bladePoints = [byId.guardCenter, SHOULDER_RIGHT, byId.tip, SHOULDER_LEFT, byId.guardCenter].map(px);
-    const d = bladePoints.map(([x, y], i) => `${i === 0 ? "M" : "L"} ${x} ${y}`).join(" ");
+    // the dagger's outline, drawn as one continuous stroke
+    const d = outlinePoints()
+      .map((pt, i) => {
+        const [x, y] = px(pt);
+        return `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
+      })
+      .join(" ") + " Z";
 
     const blade = document.createElementNS(SVG_NS, "path");
     blade.setAttribute("d", d);
     blade.setAttribute("class", "constellation-line");
     svg.appendChild(blade);
-    const bladeLength = blade.getTotalLength();
-    blade.style.strokeDasharray = bladeLength;
-    blade.style.strokeDashoffset = bladeLength;
-    blade.style.animation = `constellation-draw 0.9s ease forwards ${delay}s`;
-    delay += 0.9;
+    const outlineLength = blade.getTotalLength();
+    blade.style.strokeDasharray = outlineLength;
+    blade.style.strokeDashoffset = outlineLength;
+    const outlineDuration = 1.4;
+    blade.style.animation = `constellation-draw ${outlineDuration}s ease forwards 0s`;
 
-    setTimeout(fadeAndGo, delay * 1000 + 900);
+    // a thin fuller (centre ridge line) down the blade, drawn as a flourish
+    // right after the outline finishes
+    const [cx1, cy1] = px(byId.guardCenter);
+    const [cx2, cy2] = px(byId.tip);
+    const fullerLength = Math.hypot(cx2 - cx1, cy2 - cy1);
+    const fullerDelay = outlineDuration + 0.1;
+    const fullerDuration = 0.5;
+
+    const fuller = document.createElementNS(SVG_NS, "line");
+    fuller.setAttribute("x1", cx1);
+    fuller.setAttribute("y1", cy1);
+    fuller.setAttribute("x2", cx2);
+    fuller.setAttribute("y2", cy2);
+    fuller.setAttribute("class", "constellation-line constellation-fuller");
+    fuller.style.strokeDasharray = fullerLength;
+    fuller.style.strokeDashoffset = fullerLength;
+    fuller.style.animation = `constellation-draw ${fullerDuration}s ease forwards ${fullerDelay}s`;
+    svg.appendChild(fuller);
+
+    const totalDrawTime = fullerDelay + fullerDuration;
+    setTimeout(fadeAndGo, totalDrawTime * 1000 + 900);
   }
 
   function fadeAndGo() {

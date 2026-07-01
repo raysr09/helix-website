@@ -105,7 +105,12 @@ html, body {
 .constellation-line {
   stroke: rgba(150, 200, 255, 0.9);
   stroke-width: 1.5;
+  fill: none;
   filter: drop-shadow(0 0 6px rgba(150, 200, 255, 0.9));
+}
+.constellation-fuller {
+  stroke-width: 1;
+  opacity: 0.65;
 }
 @keyframes constellation-draw {
   to { stroke-dashoffset: 0; }
