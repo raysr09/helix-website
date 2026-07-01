@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HELIX — The Galaxy</title>
+  <meta name="description" content="The creative galaxy of Helix — film, coding, fashion, painting and photography, explored as a journey through space." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/galaxy.css" />
+  <link rel="stylesheet" href="css/intro.css" />
+</head>
+<body>
+
+  <!-- ============ WARP-IN INTRO (plays every visit, skippable) ============ -->
+  <div id="intro" class="intro">
+    <canvas id="warp-canvas" class="warp-canvas"></canvas>
+    <button id="skip-intro" class="skip-intro" type="button">Skip&nbsp;&#9656;</button>
+  </div>
+
+  <!-- ============ THE GALAXY ============ -->
+  <main id="galaxy" class="galaxy" aria-hidden="true">
+    <!-- animated starfield sits behind everything -->
+    <canvas id="star-canvas" class="star-canvas"></canvas>
+
+    <!-- live-viewer ships are drawn onto this layer -->
+    <div id="ship-layer" class="ship-layer" aria-hidden="true"></div>
+
+    <!-- the orbital system; planets are injected here by galaxy.js -->
+    <div id="system" class="system">
+      <div class="sun-glow"></div>
+      <div class="helix" id="helix">
+        <img src="images/helix-placeholder.svg" alt="Helix" class="helix-img" />
+        <span class="helix-word">HELIX</span>
+      </div>
+      <!-- orbit rings + planets injected here -->
+    </div>
+
+    <!-- floating label shown when hovering a planet -->
+    <div id="planet-label" class="planet-label" hidden>
+      <span class="planet-label-name"></span>
+      <span class="planet-label-tagline"></span>
+    </div>
+
+    <!-- The Hitchhiker's Guide entry point -->
+    <a href="blog/index.html" class="guide-link" title="The Hitchhiker's Guide to the Galaxy">
+      <span class="guide-icon" aria-hidden="true">&#128214;</span>
+      <span class="guide-text">The Guide</span>
+    </a>
+
+    <!-- live viewer count -->
+    <div class="presence-readout" id="presence-readout" title="Travellers exploring right now">
+      <span class="presence-dot"></span>
+      <span id="presence-count">1</span> exploring now
+    </div>
+
+    <header class="galaxy-intro-text">
+      <h1>HELIX</h1>
+      <p>A galaxy of creative endeavours. Choose a world to explore.</p>
+    </header>
+  </main>
+
+  <!-- data + scripts (order matters: data first) -->
+  <script src="data/planets.js"></script>
+  <script src="js/stars.js"></script>
+  <script src="js/galaxy.js"></script>
+  <script src="js/intro.js"></script>
+
+  <!-- Supabase client (used by presence.js if you add your keys) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/presence.js"></script>
+</body>
+</html>

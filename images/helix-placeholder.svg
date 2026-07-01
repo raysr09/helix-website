@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  helix-placeholder.svg
+  ---------------------
+  This is a STAND-IN for Helix's focal star. Swap it out later:
+  just replace this file with your own graphic (keep the same
+  filename "helix-placeholder.svg", OR change the <img src> in
+  index.html to point at your new file).
+-->
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Helix star">
+  <defs>
+    <radialGradient id="core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#bfe3ff"/>
+      <stop offset="70%" stop-color="#5aa6ff"/>
+      <stop offset="100%" stop-color="#1f4fb0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="strand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#8fe9ff"/>
+      <stop offset="100%" stop-color="#9b8cff"/>
+    </linearGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.2"/>
+    </filter>
+  </defs>
+
+  <!-- outer glow -->
+  <circle cx="100" cy="100" r="78" fill="url(#core)" opacity="0.55"/>
+
+  <!-- the double-helix strands, suggesting the name -->
+  <g filter="url(#soft)" fill="none" stroke="url(#strand)" stroke-width="4" stroke-linecap="round">
+    <path d="M70 28 C 130 60, 70 90, 130 122 C 70 154, 130 176, 70 176"/>
+    <path d="M130 28 C 70 60, 130 90, 70 122 C 130 154, 70 176, 130 176"/>
+  </g>
+
+  <!-- rungs of the helix -->
+  <g stroke="#dff4ff" stroke-width="2.5" stroke-linecap="round" opacity="0.85">
+    <line x1="78"  y1="46"  x2="122" y2="46"/>
+    <line x1="86"  y1="76"  x2="114" y2="76"/>
+    <line x1="90"  y1="106" x2="110" y2="106"/>
+    <line x1="86"  y1="136" x2="114" y2="136"/>
+    <line x1="78"  y1="160" x2="122" y2="160"/>
+  </g>
+
+  <!-- bright core -->
+  <circle cx="100" cy="100" r="16" fill="url(#core)"/>
+  <circle cx="100" cy="100" r="6"  fill="#ffffff"/>
+</svg>

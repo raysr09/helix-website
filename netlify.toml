@@ -1,0 +1,20 @@
+# =====================================================================
+# Netlify configuration for the Helix website.
+# This is a plain static site — no build step, just publish the files.
+# =====================================================================
+
+[build]
+  publish = "."          # serve files straight from the repo root
+  command = ""           # no build command needed
+
+# Redirect the bare /admin to the CMS entry point (nicety).
+[[redirects]]
+  from = "/admin"
+  to = "/admin/index.html"
+  status = 200
+
+# Sensible caching: don't cache the editable content so new posts show up fast.
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+    Cache-Control = "no-cache"
