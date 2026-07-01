@@ -33,15 +33,12 @@
   // The secret click order (a visitor must click these, in this order).
   const SECRET_ORDER = ["pommel", "guardLeft", "guardRight", "guardCenter", "tip"];
 
-  // The visual edges to draw once the sequence is completed — independent
-  // of click order, so the reveal actually looks like a dagger (a blade
-  // through the middle, crossed by a guard).
-  const EDGES = [
-    ["pommel", "guardCenter"],
-    ["guardLeft", "guardRight"],
-    ["guardCenter", "tip"],
-  ];
+  // Two extra points (not clickable, purely decorative) used only to give
+  // the blade its taper — without these the reveal is just a plus-sign.
+  const SHOULDER_RIGHT = { x: 19, y: 30 };
+  const SHOULDER_LEFT = { x: 13, y: 30 };
 
+  const SVG_NS = "http://www.w3.org/2000/svg";
   const byId = {};
   let progress = 0;
 
@@ -73,20 +70,26 @@
   function reveal() {
     if (reduceMotion) { fadeAndGo(); return; }
 
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const svg = document.createElementNS(SVG_NS, "svg");
     svg.setAttribute("class", "constellation-svg");
     svg.setAttribute("width", window.innerWidth);
     svg.setAttribute("height", window.innerHeight);
+    document.body.appendChild(svg);
 
-    EDGES.forEach(([fromId, toId], i) => {
-      const a = byId[fromId], b = byId[toId];
-      const x1 = (a.x / 100) * window.innerWidth;
-      const y1 = (a.y / 100) * window.innerHeight;
-      const x2 = (b.x / 100) * window.innerWidth;
-      const y2 = (b.y / 100) * window.innerHeight;
+    const px = (pt) => [(pt.x / 100) * window.innerWidth, (pt.y / 100) * window.innerHeight];
+    let delay = 0;
+
+    // grip (pommel -> guardCenter) and crossguard (guardLeft -> guardRight)
+    // are simple straight strokes, drawn first.
+    [
+      [byId.pommel, byId.guardCenter],
+      [byId.guardLeft, byId.guardRight],
+    ].forEach(([a, b]) => {
+      const [x1, y1] = px(a);
+      const [x2, y2] = px(b);
       const length = Math.hypot(x2 - x1, y2 - y1);
 
-      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      const line = document.createElementNS(SVG_NS, "line");
       line.setAttribute("x1", x1);
       line.setAttribute("y1", y1);
       line.setAttribute("x2", x2);
@@ -94,12 +97,28 @@
       line.setAttribute("class", "constellation-line");
       line.style.strokeDasharray = length;
       line.style.strokeDashoffset = length;
-      line.style.animation = `constellation-draw 0.5s ease forwards ${i * 0.25}s`;
+      line.style.animation = `constellation-draw 0.4s ease forwards ${delay}s`;
       svg.appendChild(line);
+      delay += 0.3;
     });
 
-    document.body.appendChild(svg);
-    setTimeout(fadeAndGo, EDGES.length * 250 + 1200);
+    // the blade itself: a tapered outline from the crossguard down to the
+    // tip, through two shoulder points — this is what actually reads as
+    // a dagger rather than a plus sign.
+    const bladePoints = [byId.guardCenter, SHOULDER_RIGHT, byId.tip, SHOULDER_LEFT, byId.guardCenter].map(px);
+    const d = bladePoints.map(([x, y], i) => `${i === 0 ? "M" : "L"} ${x} ${y}`).join(" ");
+
+    const blade = document.createElementNS(SVG_NS, "path");
+    blade.setAttribute("d", d);
+    blade.setAttribute("class", "constellation-line");
+    svg.appendChild(blade);
+    const bladeLength = blade.getTotalLength();
+    blade.style.strokeDasharray = bladeLength;
+    blade.style.strokeDashoffset = bladeLength;
+    blade.style.animation = `constellation-draw 0.9s ease forwards ${delay}s`;
+    delay += 0.9;
+
+    setTimeout(fadeAndGo, delay * 1000 + 900);
   }
 
   function fadeAndGo() {
