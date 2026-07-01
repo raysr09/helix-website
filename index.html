@@ -29,6 +29,9 @@
     <!-- live-viewer ships are drawn onto this layer -->
     <div id="ship-layer" class="ship-layer" aria-hidden="true"></div>
 
+    <!-- a few of these background "stars" are secretly clickable -->
+    <div id="secret-layer" class="secret-layer" aria-hidden="true"></div>
+
     <!-- the orbital system; planets are injected here by galaxy.js -->
     <div id="system" class="system">
       <div class="sun-glow"></div>
@@ -68,6 +71,7 @@
   <script src="js/stars.js"></script>
   <script src="js/galaxy.js"></script>
   <script src="js/intro.js"></script>
+  <script src="js/secret.js"></script>
 
   <!-- Supabase client (used by presence.js if you add your keys) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

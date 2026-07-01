@@ -57,6 +57,60 @@ html, body {
   z-index: 3;
 }
 
+/* ---------- Secret constellation stars (see js/secret.js) ---------- */
+.secret-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.secret-star {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: default;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.secret-star::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(222, 232, 255, 0.85);
+  box-shadow: 0 0 4px rgba(200, 220, 255, 0.7);
+  animation: secret-twinkle 3.4s ease-in-out infinite;
+  animation-delay: var(--twinkle-delay, 0s);
+}
+@keyframes secret-twinkle {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 1; }
+}
+
+/* the constellation reveal, drawn once the secret order is completed */
+.constellation-svg {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.constellation-line {
+  stroke: rgba(150, 200, 255, 0.9);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 6px rgba(150, 200, 255, 0.9));
+}
+@keyframes constellation-draw {
+  to { stroke-dashoffset: 0; }
+}
+
 /* ---------- The orbital system ---------- */
 .system {
   position: absolute;
@@ -299,5 +353,5 @@ html, body {
 
 /* respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
-  .helix-img, .sun-glow, .orbit-arm, .planet, .guide-icon, .presence-dot { animation: none !important; }
+  .helix-img, .sun-glow, .orbit-arm, .planet, .guide-icon, .presence-dot, .secret-star::before { animation: none !important; }
 }
