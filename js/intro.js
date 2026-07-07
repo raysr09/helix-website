@@ -15,14 +15,22 @@
   const ctx = canvas.getContext("2d");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // The full warp plays when someone first arrives at the site; hopping
+  // back from a world or the blog gets a quick ~1s version instead.
+  let returning = false;
+  try { returning = sessionStorage.getItem("helixSeenIntro") === "1"; } catch (e) {}
+
   let w, h, cx, cy;
   let warpStars = [];
   let speed = 0;
   let running = true;
   let startTime = null;
-  const DURATION = reduceMotion ? 600 : 3400; // ms
+  const DURATION = reduceMotion ? 600 : (returning ? 950 : 3400); // ms
 
-  const STAR_COUNT = reduceMotion ? 60 : 320;
+  const STAR_COUNT = reduceMotion ? 60 : (returning ? 160 : 320);
+
+  // no need for a skip button on the already-quick version
+  if (returning && skipBtn) skipBtn.style.display = "none";
 
   function resize() {
     w = canvas.width = window.innerWidth;
@@ -95,6 +103,8 @@
   function finish() {
     if (!running) return;
     running = false;
+    // remember this visit, so internal returns get the quick intro
+    try { sessionStorage.setItem("helixSeenIntro", "1"); } catch (e) {}
     // reveal galaxy, fade out intro
     galaxy.classList.add("revealed");
     galaxy.setAttribute("aria-hidden", "false");

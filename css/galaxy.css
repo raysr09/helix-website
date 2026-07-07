@@ -1,6 +1,6 @@
 /* ===========================================================
    galaxy.css — The Galaxy main page
-   Deep, cinematic space. Near-black with nebula depth.
+   A vast, calm nebula-scape. Deep space with slow cosmic drift.
    =========================================================== */
 
 :root {
@@ -28,16 +28,49 @@ html, body {
 .galaxy {
   position: fixed;
   inset: 0;
-  /* layered nebula clouds for depth */
+  /* deep-space base: faint milky-way band + ambient colour depth */
   background:
-    radial-gradient(ellipse 60% 50% at 25% 30%, rgba(91, 60, 160, 0.18), transparent 60%),
-    radial-gradient(ellipse 50% 50% at 80% 70%, rgba(20, 110, 130, 0.16), transparent 60%),
-    radial-gradient(ellipse 70% 60% at 60% 20%, rgba(120, 40, 90, 0.10), transparent 65%),
+    linear-gradient(115deg, transparent 38%, rgba(150, 160, 220, 0.045) 47%, rgba(190, 200, 240, 0.07) 50%, rgba(150, 160, 220, 0.045) 53%, transparent 62%),
+    radial-gradient(ellipse 70% 60% at 30% 25%, rgba(80, 55, 150, 0.13), transparent 60%),
+    radial-gradient(ellipse 60% 55% at 78% 72%, rgba(20, 100, 125, 0.11), transparent 60%),
     var(--space-black);
   opacity: 0;
   transition: opacity 1.4s ease;
 }
 .galaxy.revealed { opacity: 1; }
+
+/* two huge, ultra-soft ambient clouds that drift on their own,
+   so deep space never feels frozen */
+.galaxy::before,
+.galaxy::after {
+  content: "";
+  position: absolute;
+  width: 90vmax;
+  height: 90vmax;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform;
+}
+.galaxy::before {
+  top: -30vmax;
+  left: -20vmax;
+  background: radial-gradient(circle, rgba(110, 70, 190, 0.10), transparent 60%);
+  animation: ambient-drift-a 120s ease-in-out infinite alternate;
+}
+.galaxy::after {
+  bottom: -35vmax;
+  right: -25vmax;
+  background: radial-gradient(circle, rgba(30, 120, 150, 0.09), transparent 60%);
+  animation: ambient-drift-b 150s ease-in-out infinite alternate;
+}
+@keyframes ambient-drift-a {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(8vmax, 5vmax) scale(1.12); }
+}
+@keyframes ambient-drift-b {
+  from { transform: translate(0, 0) scale(1.08); }
+  to   { transform: translate(-7vmax, -4vmax) scale(1); }
+}
 
 /* starfield canvas */
 .star-canvas,
@@ -62,7 +95,7 @@ html, body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: 5;
 }
 .secret-star {
   position: absolute;
@@ -116,51 +149,159 @@ html, body {
   to { stroke-dashoffset: 0; }
 }
 
-/* ---------- The orbital system ---------- */
-.system {
+/* ---------- Nebula worlds (built by galaxy.js) ---------- */
+.nebula-layer {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 0;
-  height: 0;
+  inset: 0;
   z-index: 2;
 }
+.nebula {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  animation: nebula-drift 30s ease-in-out infinite alternate;
+  animation-delay: var(--drift-delay, 0s);
+}
+@keyframes nebula-drift {
+  from { margin-top: 0; }
+  to   { margin-top: 2.2vmin; }
+}
 
-/* warm anchoring glow behind Helix — the "sun" */
-.sun-glow {
+/* the soft coloured cloud */
+.nebula-cloud {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 520px;
-  height: 520px;
+  width: var(--size);
+  height: calc(var(--size) * 0.82);
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(255, 196, 120, 0.16), rgba(255, 150, 90, 0.05) 40%, transparent 70%);
-  border-radius: 50%;
   pointer-events: none;
-  animation: sun-breathe 9s ease-in-out infinite;
+  background:
+    radial-gradient(ellipse 60% 50% at 42% 46%, color-mix(in srgb, var(--color) 42%, transparent), transparent 70%),
+    radial-gradient(ellipse 45% 60% at 62% 58%, color-mix(in srgb, var(--color) 26%, transparent), transparent 70%),
+    radial-gradient(ellipse 70% 45% at 50% 40%, color-mix(in srgb, var(--color) 14%, transparent), transparent 75%);
+  filter: blur(14px);
+  mix-blend-mode: screen;
+  animation: nebula-breathe 24s ease-in-out infinite alternate;
+  animation-delay: var(--drift-delay, 0s);
+  will-change: transform, opacity;
 }
-@keyframes sun-breathe {
-  0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
-  50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.06); }
+@keyframes nebula-breathe {
+  from { transform: translate(-50%, -50%) scale(1);    opacity: 0.85; }
+  to   { transform: translate(-50%, -50%) scale(1.09); opacity: 1; }
 }
 
-/* Helix focal point */
-.helix {
+/* the bright core — the click target */
+.nebula-core {
+  position: relative;
+  display: block;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  margin: -23px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.nebula-core::before {
+  content: "";
   position: absolute;
   top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 40% 40%, #fff, color-mix(in srgb, var(--color) 80%, #fff));
+  box-shadow:
+    0 0 12px var(--color),
+    0 0 34px color-mix(in srgb, var(--color) 65%, transparent),
+    0 0 70px color-mix(in srgb, var(--color) 35%, transparent);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.nebula:hover .nebula-core::before,
+.nebula-core:focus-visible::before {
+  transform: translate(-50%, -50%) scale(1.5);
+  box-shadow:
+    0 0 16px var(--color),
+    0 0 46px color-mix(in srgb, var(--color) 80%, transparent),
+    0 0 100px color-mix(in srgb, var(--color) 45%, transparent);
+}
+.nebula-core:focus { outline: none; }
+
+/* name always visible; tagline appears on hover/focus */
+.nebula-label {
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.nebula-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  text-transform: uppercase;
+  color: rgba(234, 241, 255, 0.72);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--color) 60%, transparent);
+  transition: color 0.4s ease;
+}
+.nebula:hover .nebula-name { color: #fff; }
+.nebula-tagline {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.nebula:hover .nebula-tagline,
+.nebula-core:focus-visible ~ .nebula-label .nebula-tagline {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Helix focal point ---------- */
+.helix {
+  position: absolute;
+  top: 46%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   z-index: 4;
+  pointer-events: none;
+}
+.helix::before { /* soft anchoring halo behind Helix */
+  content: "";
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  width: 46vmin;
+  height: 46vmin;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(140, 170, 255, 0.10), transparent 65%);
+  border-radius: 50%;
+  animation: helix-halo 12s ease-in-out infinite alternate;
+}
+@keyframes helix-halo {
+  from { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+  to   { opacity: 1;   transform: translate(-50%, -50%) scale(1.08); }
 }
 .helix-img {
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   filter: drop-shadow(0 0 22px rgba(120, 180, 255, 0.65));
-  animation: helix-spin 26s linear infinite, helix-pulse 6s ease-in-out infinite;
+  animation: helix-spin 40s linear infinite, helix-pulse 8s ease-in-out infinite;
 }
 @keyframes helix-spin  { to { transform: rotate(360deg); } }
 @keyframes helix-pulse {
@@ -168,87 +309,13 @@ html, body {
   50%      { filter: drop-shadow(0 0 38px rgba(150, 200, 255, 0.95)); }
 }
 .helix-word {
-  margin-top: 14px;
+  margin-top: 12px;
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   letter-spacing: 0.55em;
   text-indent: 0.55em; /* compensate letter-spacing for centring */
   color: #eaf1ff;
   text-shadow: 0 0 18px rgba(120, 180, 255, 0.55);
-}
-
-/* ---------- Orbit rings (injected by galaxy.js) ---------- */
-.orbit {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid rgba(150, 170, 220, 0.10);
-  border-radius: 50%;
-  pointer-events: none;
-  box-shadow: 0 0 30px rgba(120, 150, 220, 0.04) inset;
-}
-
-/* a rotating arm that carries one planet around the centre */
-.orbit-arm {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform-origin: 0 0;
-  animation: orbit-rotate linear infinite;
-}
-@keyframes orbit-rotate { to { transform: rotate(360deg); } }
-
-/* the planet body */
-.planet {
-  position: absolute;
-  border-radius: 50%;
-  cursor: pointer;
-  transform: translate(-50%, -50%);
-  /* counter-rotates so the planet itself doesn't visibly spin */
-  animation: orbit-counter linear infinite;
-  transition: filter 0.3s ease, transform 0.3s ease;
-}
-@keyframes orbit-counter { to { transform: translate(-50%, -50%) rotate(-360deg); } }
-
-.planet::after { /* subtle surface sheen */
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.45), transparent 55%);
-}
-.planet:hover { filter: brightness(1.35) saturate(1.2); }
-
-/* ---------- Floating hover label ---------- */
-.planet-label {
-  position: fixed;
-  z-index: 6;
-  pointer-events: none;
-  transform: translate(-50%, -140%);
-  text-align: center;
-  white-space: nowrap;
-  padding: 6px 14px;
-  border-radius: 10px;
-  background: rgba(8, 10, 26, 0.72);
-  border: 1px solid rgba(150, 170, 220, 0.18);
-  backdrop-filter: blur(4px);
-  animation: label-in 0.25s ease;
-}
-@keyframes label-in { from { opacity: 0; transform: translate(-50%, -120%); } }
-.planet-label-name {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  letter-spacing: 0.12em;
-  color: #fff;
-}
-.planet-label-tagline {
-  display: block;
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-faint);
 }
 
 /* ---------- The Guide link ---------- */
@@ -269,13 +336,15 @@ html, body {
   backdrop-filter: blur(4px);
   transition: border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
 }
-.guide-link:hover { border-color: rgba(150,190,255,0.6); color: #fff; transform: translateY(-2px); }
+.guide-link:hover { border-color: rgba(150, 190, 255, 0.6); color: #fff; transform: translateY(-2px); }
 .guide-icon {
-  font-size: 1.4rem;
+  width: 22px;
+  height: 22px;
   animation: guide-float 4s ease-in-out infinite;
   filter: drop-shadow(0 0 8px rgba(150, 190, 255, 0.6));
 }
-@keyframes guide-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.guide-icon svg { display: block; width: 100%; height: 100%; }
+@keyframes guide-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 .guide-text { font-size: 0.85rem; letter-spacing: 0.18em; text-transform: uppercase; }
 
 /* ---------- Presence readout ---------- */
@@ -299,7 +368,7 @@ html, body {
   box-shadow: 0 0 10px #46e6a0;
   animation: pulse-dot 2s ease-in-out infinite;
 }
-@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 
 /* ---------- Title text ---------- */
 .galaxy-intro-text {
@@ -330,33 +399,50 @@ html, body {
 /* ---------- A live-viewer ship ---------- */
 .ship {
   position: absolute;
-  width: 14px;
-  height: 14px;
-  margin: -7px 0 0 -7px;
-  transition: left 2.4s linear, top 2.4s linear;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  transition: left 9s linear, top 9s linear, opacity 0.6s ease;
   will-change: left, top;
 }
-.ship svg { display: block; filter: drop-shadow(0 0 6px rgba(150, 200, 255, 0.8)); }
-.ship-trail {
-  position: absolute;
-  width: 3px; height: 3px;
-  border-radius: 50%;
-  background: rgba(150, 200, 255, 0.5);
-  pointer-events: none;
-  animation: trail-fade 1.6s ease forwards;
+.ship svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 5px rgba(150, 200, 255, 0.55));
 }
-@keyframes trail-fade { to { opacity: 0; transform: scale(0.2); } }
+.ship .engine {
+  animation: engine-glow 1.6s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes engine-glow {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+/* ---------- The wormhole overlay (created by galaxy.js) ---------- */
+.wormhole-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
 
 /* ---------- Smaller screens ---------- */
 @media (max-width: 760px) {
-  .helix-img { width: 110px; height: 110px; }
-  .helix-word { font-size: 1.2rem; letter-spacing: 0.4em; text-indent: 0.4em; }
+  .helix-img { width: 90px; height: 90px; }
+  .helix-word { font-size: 1.1rem; letter-spacing: 0.4em; text-indent: 0.4em; }
   .galaxy-intro-text p { display: none; }
   .guide-text { display: none; }
-  /* galaxy.js scales orbits down on small screens via a CSS variable */
+  .nebula-name { font-size: 0.95rem; }
+  .nebula-tagline { display: none; }
+  /* larger tap target on touch screens */
+  .nebula-core { width: 60px; height: 60px; margin: -30px; }
 }
 
 /* respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
-  .helix-img, .sun-glow, .orbit-arm, .planet, .guide-icon, .presence-dot, .secret-star::before { animation: none !important; }
+  .helix-img, .helix::before, .galaxy::before, .galaxy::after,
+  .nebula, .nebula-cloud, .guide-icon, .presence-dot,
+  .secret-star::before, .ship .engine { animation: none !important; }
 }

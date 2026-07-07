@@ -1,16 +1,18 @@
 /* ===========================================================
-   presence.js — Live viewers as tiny drifting ships.
+   presence.js — Live viewers as little drifting spaceships.
    ===========================================================
 
    HOW THIS WORKS
    --------------
    Every person currently on the site is shown to everyone else as a
-   small glowing ship drifting across the galaxy. This needs a free
+   small spaceship drifting through the galaxy. This needs a free
    real-time service called Supabase.
 
    ▶ UNTIL YOU ADD YOUR SUPABASE KEYS BELOW, this file runs in
      "demo mode": it shows a few simulated ships so you can see the
      effect locally. No setup required to preview.
+     (In demo mode the Supabase library isn't even downloaded, so
+     the page stays fast.)
 
    ▶ TO MAKE IT REAL (other actual visitors), follow the steps in
      README.md under "Live presence setup", then paste your two
@@ -29,13 +31,25 @@ const SUPABASE_ANON_KEY = "";  // the long "anon public" key
   if (!layer) return;
 
   const myId = "v_" + Math.random().toString(36).slice(2, 10);
-  const ships = new Map(); // id -> { el, x, y, tx, ty }
+  const ships = new Map(); // id -> { el, x, y }
 
-  /* ---------- shared ship rendering ---------- */
+  /* ---------- ship rendering ---------- */
+  // A small side-view spacecraft: hull, cockpit, fins, and a
+  // pulsing engine glow. Drawn pointing up; rotated in flight.
   function shipSVG() {
     return (
-      '<svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg">' +
-      '<path d="M12 2 L19 20 L12 16 L5 20 Z" fill="#bcdcff"/>' +
+      '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+      // engine glow (animated via CSS .engine)
+      '<ellipse class="engine" cx="12" cy="20.5" rx="2.2" ry="3.2" fill="#7fd4ff" opacity="0.8"/>' +
+      // side fins
+      '<path d="M8.6 12 L5.2 17.5 L8.8 16 Z" fill="#7688b8"/>' +
+      '<path d="M15.4 12 L18.8 17.5 L15.2 16 Z" fill="#7688b8"/>' +
+      // hull
+      '<path d="M12 2.4 C 14.4 5.2, 15 9, 14.6 12.6 C 14.4 14.6, 13.8 16.4, 12 17.6 C 10.2 16.4, 9.6 14.6, 9.4 12.6 C 9 9, 9.6 5.2, 12 2.4 Z" fill="#aebcdd"/>' +
+      // hull shading line
+      '<path d="M12 2.4 C 13 5.2, 13.3 9, 13.1 12.6 C 13 14.6, 12.7 16.4, 12 17.6" fill="none" stroke="#8fa0c8" stroke-width="0.6"/>' +
+      // cockpit window
+      '<circle cx="12" cy="8" r="1.6" fill="#dff2ff" stroke="#5f7aa8" stroke-width="0.5"/>' +
       '</svg>'
     );
   }
@@ -49,39 +63,39 @@ const SUPABASE_ANON_KEY = "";  // the long "anon public" key
     const y = Math.random() * window.innerHeight;
     el.style.left = x + "px";
     el.style.top = y + "px";
+    el.style.opacity = "0";
     layer.appendChild(el);
-    ships.set(id, { el, x, y, tx: x, ty: y });
+    requestAnimationFrame(() => { el.style.opacity = "1"; });
+    ships.set(id, { el, x, y });
   }
 
   function removeShip(id) {
     const s = ships.get(id);
     if (!s) return;
     s.el.style.opacity = "0";
-    setTimeout(() => s.el.remove(), 600);
+    setTimeout(() => s.el.remove(), 700);
     ships.delete(id);
   }
 
-  // gently drift every ship to a new random target periodically
+  // A calm cruise: each ship glides to a nearby point (not across the
+  // whole screen), so the movement reads as slow wandering.
   function drift() {
+    const reach = Math.min(window.innerWidth, window.innerHeight) * 0.22;
     ships.forEach((s) => {
-      s.tx = Math.random() * window.innerWidth;
-      s.ty = Math.random() * window.innerHeight;
-      // point the ship toward its target
-      const ang = Math.atan2(s.ty - s.y, s.tx - s.x) * (180 / Math.PI) + 90;
+      const tx = clamp(s.x + (Math.random() - 0.5) * 2 * reach, 30, window.innerWidth - 30);
+      const ty = clamp(s.y + (Math.random() - 0.5) * 2 * reach, 30, window.innerHeight - 30);
+      // point the ship along its heading
+      const ang = Math.atan2(ty - s.y, tx - s.x) * (180 / Math.PI) + 90;
       s.el.style.transform = `rotate(${ang}deg)`;
-      s.el.style.left = s.tx + "px";
-      s.el.style.top = s.ty + "px";
-      // leave a fading trail dot
-      const trail = document.createElement("div");
-      trail.className = "ship-trail";
-      trail.style.left = s.x + "px";
-      trail.style.top = s.y + "px";
-      layer.appendChild(trail);
-      setTimeout(() => trail.remove(), 1600);
-      s.x = s.tx; s.y = s.ty;
+      s.el.style.left = tx + "px";
+      s.el.style.top = ty + "px";
+      s.x = tx; s.y = ty;
     });
   }
-  setInterval(drift, 2600);
+  setInterval(drift, 9500);
+  setTimeout(drift, 600); // first gentle move soon after load
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
   function updateCount(n) {
     if (countEl) countEl.textContent = String(Math.max(1, n));
@@ -114,11 +128,10 @@ const SUPABASE_ANON_KEY = "";  // the long "anon public" key
 
   /* ---------- DEMO mode: simulated ships ---------- */
   function startDemo() {
-    const fakeCount = 2 + Math.floor(Math.random() * 4); // 2–5 others
+    const fakeCount = 2 + Math.floor(Math.random() * 3); // 2–4 others
     for (let i = 0; i < fakeCount; i++) addShip("demo_" + i);
     updateCount(fakeCount + 1);
-    drift();
-    // occasionally a ship leaves and another joins, to feel alive
+    // occasionally a ship leaves and another arrives, to feel alive
     setInterval(() => {
       const ids = Array.from(ships.keys());
       if (ids.length > 1 && Math.random() < 0.5) {
@@ -127,14 +140,21 @@ const SUPABASE_ANON_KEY = "";  // the long "anon public" key
         addShip("demo_" + Math.random().toString(36).slice(2, 6));
       }
       updateCount(ships.size + 1);
-    }, 9000);
+    }, 20000);
   }
 
-  // Decide which mode to run
-  const hasKeys = SUPABASE_URL && SUPABASE_ANON_KEY;
-  if (hasKeys && window.supabase && typeof window.supabase.createClient === "function") {
-    try { startRealtime(); }
-    catch (e) { console.warn("Presence: falling back to demo mode.", e); startDemo(); }
+  /* ---------- pick a mode ---------- */
+  // Only download the Supabase library once real keys exist; until
+  // then, demo mode runs with zero extra network cost.
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    const lib = document.createElement("script");
+    lib.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+    lib.onload = () => {
+      try { startRealtime(); }
+      catch (e) { console.warn("Presence: falling back to demo mode.", e); startDemo(); }
+    };
+    lib.onerror = () => startDemo();
+    document.head.appendChild(lib);
   } else {
     startDemo();
   }

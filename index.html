@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#05050f" />
   <title>HELIX — The Galaxy</title>
   <meta name="description" content="The creative galaxy of Helix — film, coding, fashion, painting and photography, explored as a journey through space." />
+  <link rel="icon" href="images/helix-placeholder.svg" type="image/svg+xml" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,7 +17,7 @@
 </head>
 <body>
 
-  <!-- ============ WARP-IN INTRO (plays every visit, skippable) ============ -->
+  <!-- ============ WARP-IN INTRO (full on arrival, quick on returns) ============ -->
   <div id="intro" class="intro">
     <canvas id="warp-canvas" class="warp-canvas"></canvas>
     <button id="skip-intro" class="skip-intro" type="button">Skip&nbsp;&#9656;</button>
@@ -32,25 +34,25 @@
     <!-- a few of these background "stars" are secretly clickable -->
     <div id="secret-layer" class="secret-layer" aria-hidden="true"></div>
 
-    <!-- the orbital system; planets are injected here by galaxy.js -->
-    <div id="system" class="system">
-      <div class="sun-glow"></div>
-      <div class="helix" id="helix">
-        <img src="images/helix-placeholder.svg" alt="Helix" class="helix-img" />
-        <span class="helix-word">HELIX</span>
-      </div>
-      <!-- orbit rings + planets injected here -->
-    </div>
+    <!-- the nebula worlds; injected here by galaxy.js -->
+    <div id="nebula-layer" class="nebula-layer"></div>
 
-    <!-- floating label shown when hovering a planet -->
-    <div id="planet-label" class="planet-label" hidden>
-      <span class="planet-label-name"></span>
-      <span class="planet-label-tagline"></span>
+    <!-- Helix, the galaxy's anchor -->
+    <div class="helix" id="helix">
+      <img src="images/helix-placeholder.svg" alt="Helix" class="helix-img" />
+      <span class="helix-word">HELIX</span>
     </div>
 
     <!-- The Hitchhiker's Guide entry point -->
     <a href="blog/index.html" class="guide-link" title="The Hitchhiker's Guide to the Galaxy">
-      <span class="guide-icon" aria-hidden="true">&#128214;</span>
+      <span class="guide-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <!-- an open journal with a guiding star -->
+          <path d="M12 6.5 C 10 4.8, 6.5 4.6, 4 5.6 L 4 18.4 C 6.5 17.4, 10 17.6, 12 19.2 C 14 17.6, 17.5 17.4, 20 18.4 L 20 5.6 C 17.5 4.6, 14 4.8, 12 6.5 Z" />
+          <line x1="12" y1="6.5" x2="12" y2="19.2" />
+          <path d="M16 8.6 l0.55 1.15 1.25 0.16 -0.92 0.87 0.24 1.24 -1.12 -0.6 -1.12 0.6 0.24 -1.24 -0.92 -0.87 1.25 -0.16 Z" fill="currentColor" stroke="none" />
+        </svg>
+      </span>
       <span class="guide-text">The Guide</span>
     </a>
 
@@ -66,15 +68,14 @@
     </header>
   </main>
 
-  <!-- data + scripts (order matters: data first) -->
-  <script src="data/planets.js"></script>
-  <script src="js/stars.js"></script>
-  <script src="js/galaxy.js"></script>
-  <script src="js/intro.js"></script>
-  <script src="js/secret.js"></script>
-
-  <!-- Supabase client (used by presence.js if you add your keys) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/presence.js"></script>
+  <!-- data + scripts (deferred; order matters: data first) -->
+  <script src="data/planets.js" defer></script>
+  <script src="js/stars.js" defer></script>
+  <script src="js/galaxy.js" defer></script>
+  <script src="js/intro.js" defer></script>
+  <script src="js/secret.js" defer></script>
+  <!-- presence.js loads the Supabase library by itself, and only
+       once real keys have been added (demo mode needs nothing) -->
+  <script src="js/presence.js" defer></script>
 </body>
 </html>

@@ -1,115 +1,134 @@
 /* ===========================================================
-   galaxy.js — Builds the solar system from data/planets.js.
-   Creates orbit rings + orbiting planets, wires up hover labels
-   and click-to-navigate (with a cinematic fade-to-black).
+   galaxy.js — Builds the galaxy from data/planets.js.
+   Each creative world is a glowing nebula cloud drifting in the
+   starfield. Clicking a nebula opens a wormhole (a short tunnel
+   effect in that world's colour) and travels to its page.
    =========================================================== */
 (function () {
   "use strict";
 
-  const system = document.getElementById("system");
-  const label = document.getElementById("planet-label");
-  if (!system || typeof PLANETS === "undefined") return;
+  const galaxy = document.getElementById("galaxy");
+  const layer = document.getElementById("nebula-layer");
+  if (!galaxy || !layer || typeof WORLDS === "undefined") return;
 
-  const labelName = label.querySelector(".planet-label-name");
-  const labelTag = label.querySelector(".planet-label-tagline");
-
-  // On small screens, scale every orbit down so the system fits.
-  function orbitScale() {
-    const min = Math.min(window.innerWidth, window.innerHeight);
-    // 820px tall+ -> full size; smaller -> shrink toward 0.5
-    return Math.max(0.5, Math.min(1, min / 820));
-  }
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let travelling = false;
 
   function build() {
-    // clear any previously built rings/arms (keeps sun-glow + helix)
-    system.querySelectorAll(".orbit, .orbit-arm").forEach((n) => n.remove());
+    WORLDS.forEach((world, i) => {
+      const nebula = document.createElement("div");
+      nebula.className = "nebula";
+      nebula.style.left = world.x + "%";
+      nebula.style.top = world.y + "%";
+      nebula.style.setProperty("--color", world.color);
+      nebula.style.setProperty("--size", world.size + "vmin");
+      nebula.style.setProperty("--drift-delay", -(i * 7) + "s");
 
-    const scale = orbitScale();
+      // the soft cloud (visual only — clicks pass through it)
+      const cloud = document.createElement("div");
+      cloud.className = "nebula-cloud";
+      nebula.appendChild(cloud);
 
-    PLANETS.forEach((p) => {
-      const r = p.orbitRadius * scale;
+      // the bright core is the actual click target
+      const core = document.createElement("button");
+      core.type = "button";
+      core.className = "nebula-core";
+      core.setAttribute("aria-label", `${world.name} — ${world.tagline}`);
+      core.addEventListener("click", () => enter(world));
+      nebula.appendChild(core);
 
-      // faint visible orbit ring
-      const ring = document.createElement("div");
-      ring.className = "orbit";
-      ring.style.width = r * 2 + "px";
-      ring.style.height = r * 2 + "px";
-      system.appendChild(ring);
+      // always-visible name, tagline appears on hover/focus
+      const label = document.createElement("div");
+      label.className = "nebula-label";
+      label.innerHTML =
+        `<span class="nebula-name">${world.name}</span>` +
+        `<span class="nebula-tagline">${world.tagline}</span>`;
+      nebula.appendChild(label);
 
-      // rotating arm that carries the planet
-      const arm = document.createElement("div");
-      arm.className = "orbit-arm";
-      arm.style.width = r + "px";
-      arm.style.height = "0";
-      arm.style.animationDuration = p.orbitSpeed + "s";
-      arm.style.transform = `rotate(${p.startAngle}deg)`;
-      // negative delay starts the animation partway, honouring startAngle
-      arm.style.animationDelay = `-${(p.startAngle / 360) * p.orbitSpeed}s`;
-
-      // the planet sits at the end of the arm
-      const planet = document.createElement("button");
-      planet.className = "planet";
-      planet.type = "button";
-      planet.setAttribute("aria-label", `${p.name} — ${p.tagline}`);
-      planet.style.left = r + "px";
-      planet.style.top = "0";
-      planet.style.width = p.size + "px";
-      planet.style.height = p.size + "px";
-      planet.style.background = `radial-gradient(circle at 35% 35%, #fff 0%, ${p.color} 45%, ${shade(p.color)} 100%)`;
-      planet.style.boxShadow = `0 0 18px ${p.color}, 0 0 40px ${p.color}55`;
-      planet.style.animationDuration = p.orbitSpeed + "s";
-      planet.style.animationDelay = `-${(p.startAngle / 360) * p.orbitSpeed}s`;
-
-      // hover label follows the planet's real screen position
-      planet.addEventListener("mouseenter", () => showLabel(p, planet));
-      planet.addEventListener("mousemove", () => positionLabel(planet));
-      planet.addEventListener("mouseleave", hideLabel);
-      planet.addEventListener("focus", () => showLabel(p, planet));
-      planet.addEventListener("blur", hideLabel);
-
-      // click -> fade out -> navigate
-      planet.addEventListener("click", () => navigate(p.page));
-
-      arm.appendChild(planet);
-      system.appendChild(arm);
+      layer.appendChild(nebula);
     });
   }
 
-  function showLabel(p, planetEl) {
-    labelName.textContent = p.name;
-    labelTag.textContent = p.tagline;
-    label.hidden = false;
-    positionLabel(planetEl);
-  }
-  function positionLabel(planetEl) {
-    const rect = planetEl.getBoundingClientRect();
-    label.style.left = rect.left + rect.width / 2 + "px";
-    label.style.top = rect.top + "px";
-  }
-  function hideLabel() { label.hidden = true; }
+  /* ---------- the wormhole ---------- */
 
-  function navigate(page) {
-    const galaxy = document.getElementById("galaxy");
-    galaxy.classList.remove("revealed"); // triggers the opacity fade
-    setTimeout(() => { window.location.href = page; }, 700);
+  function enter(world) {
+    if (travelling) return;
+    travelling = true;
+
+    if (reduceMotion) {
+      galaxy.classList.remove("revealed");
+      setTimeout(() => { window.location.href = world.page; }, 500);
+      return;
+    }
+    wormhole(world.color, () => { window.location.href = world.page; });
   }
 
-  // darken a hex colour for the planet's far edge
-  function shade(hex) {
-    const c = hex.replace("#", "");
-    const n = parseInt(c.length === 3 ? c.replace(/(.)/g, "$1$1") : c, 16);
-    const r = Math.max(0, ((n >> 16) & 255) - 90);
-    const g = Math.max(0, ((n >> 8) & 255) - 90);
-    const b = Math.max(0, (n & 255) - 90);
-    return `rgb(${r}, ${g}, ${b})`;
-  }
+  // A short tunnel effect: coloured streaks rush outward from the centre
+  // as if diving into the nebula, ending in a bright flash.
+  function wormhole(color, done) {
+    const canvas = document.createElement("canvas");
+    canvas.className = "wormhole-canvas";
+    const w = (canvas.width = window.innerWidth);
+    const h = (canvas.height = window.innerHeight);
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+    const cx = w / 2, cy = h / 2;
 
-  // rebuild on resize so orbit scaling stays correct
-  let resizeTimer;
-  window.addEventListener("resize", () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(build, 200);
-  });
+    // parse the world colour so streaks can carry it
+    const n = parseInt(color.replace("#", ""), 16);
+    const cr = (n >> 16) & 255, cg = (n >> 8) & 255, cb = n & 255;
+
+    const streaks = [];
+    for (let i = 0; i < 220; i++) {
+      streaks.push({
+        angle: Math.random() * Math.PI * 2,
+        dist: Math.random() * Math.max(w, h) * 0.5,
+        speed: 2 + Math.random() * 4,
+        white: Math.random() < 0.4, // mix of white and world-coloured streaks
+      });
+    }
+
+    const DURATION = 1000;
+    const start = performance.now();
+
+    function frame(now) {
+      const t = Math.min(1, (now - start) / DURATION);
+      const accel = 1 + t * t * 14; // streaks accelerate hard toward the end
+
+      ctx.fillStyle = "rgba(0, 0, 5, 0.32)";
+      ctx.fillRect(0, 0, w, h);
+
+      for (const s of streaks) {
+        s.dist += s.speed * accel;
+        const inner = Math.max(1, s.dist * 0.72);
+        const x1 = cx + Math.cos(s.angle) * inner;
+        const y1 = cy + Math.sin(s.angle) * inner;
+        const x2 = cx + Math.cos(s.angle) * s.dist;
+        const y2 = cy + Math.sin(s.angle) * s.dist;
+        const alpha = Math.min(1, s.dist / 220) * 0.9;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = s.white
+          ? `rgba(235, 242, 255, ${alpha})`
+          : `rgba(${cr}, ${cg}, ${cb}, ${alpha})`;
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+        if (s.dist > Math.max(w, h)) s.dist = Math.random() * 60;
+      }
+
+      // bright core flash grows through the journey
+      const flash = ctx.createRadialGradient(cx, cy, 0, cx, cy, 90 + t * t * 500);
+      flash.addColorStop(0, `rgba(255, 255, 255, ${0.25 + t * 0.75})`);
+      flash.addColorStop(0.4, `rgba(${cr}, ${cg}, ${cb}, ${t * 0.5})`);
+      flash.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = flash;
+      ctx.fillRect(0, 0, w, h);
+
+      if (t < 1) { requestAnimationFrame(frame); } else { done(); }
+    }
+    requestAnimationFrame(frame);
+  }
 
   build();
 })();
