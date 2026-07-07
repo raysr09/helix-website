@@ -34,22 +34,25 @@ const SUPABASE_ANON_KEY = "";  // the long "anon public" key
   const ships = new Map(); // id -> { el, x, y }
 
   /* ---------- ship rendering ---------- */
-  // A small side-view spacecraft: hull, cockpit, fins, and a
-  // pulsing engine glow. Drawn pointing up; rotated in flight.
+  // A sleek, distant dart — a sliver of hull catching starlight,
+  // with a faint ion trail. Drawn pointing up; rotated in flight.
   function shipSVG() {
     return (
-      '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
-      // engine glow (animated via CSS .engine)
-      '<ellipse class="engine" cx="12" cy="20.5" rx="2.2" ry="3.2" fill="#7fd4ff" opacity="0.8"/>' +
-      // side fins
-      '<path d="M8.6 12 L5.2 17.5 L8.8 16 Z" fill="#7688b8"/>' +
-      '<path d="M15.4 12 L18.8 17.5 L15.2 16 Z" fill="#7688b8"/>' +
-      // hull
-      '<path d="M12 2.4 C 14.4 5.2, 15 9, 14.6 12.6 C 14.4 14.6, 13.8 16.4, 12 17.6 C 10.2 16.4, 9.6 14.6, 9.4 12.6 C 9 9, 9.6 5.2, 12 2.4 Z" fill="#aebcdd"/>' +
-      // hull shading line
-      '<path d="M12 2.4 C 13 5.2, 13.3 9, 13.1 12.6 C 13 14.6, 12.7 16.4, 12 17.6" fill="none" stroke="#8fa0c8" stroke-width="0.6"/>' +
-      // cockpit window
-      '<circle cx="12" cy="8" r="1.6" fill="#dff2ff" stroke="#5f7aa8" stroke-width="0.5"/>' +
+      '<svg viewBox="0 0 16 32" xmlns="http://www.w3.org/2000/svg">' +
+      '<defs>' +
+      '<linearGradient id="trail" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="#9fc4ef" stop-opacity="0.55"/>' +
+      '<stop offset="1" stop-color="#9fc4ef" stop-opacity="0"/>' +
+      '</linearGradient>' +
+      '</defs>' +
+      // ion trail (animated via CSS .engine)
+      '<rect class="engine" x="7.5" y="19" width="1" height="11" fill="url(#trail)"/>' +
+      // hull: a narrow angular dart
+      '<path d="M8 2 L10.2 13 L9.4 19 L8 20.6 L6.6 19 L5.8 13 Z" fill="#c3cfe4"/>' +
+      // dark canopy slit
+      '<path d="M8 6 L8.7 12 L8 13.4 L7.3 12 Z" fill="#3c4a66"/>' +
+      // edge highlight
+      '<path d="M8 2 L10.2 13 L9.4 19" fill="none" stroke="#eef4ff" stroke-width="0.5" opacity="0.7"/>' +
       '</svg>'
     );
   }

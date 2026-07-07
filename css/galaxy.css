@@ -242,12 +242,13 @@ html, body {
 }
 .nebula-name {
   display: block;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  letter-spacing: 0.28em;
-  text-indent: 0.28em;
+  font-family: var(--font-ui);
+  font-weight: 300;
+  font-size: 0.82rem;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
   text-transform: uppercase;
-  color: rgba(234, 241, 255, 0.72);
+  color: rgba(234, 241, 255, 0.66);
   text-shadow: 0 0 12px color-mix(in srgb, var(--color) 60%, transparent);
   transition: color 0.4s ease;
 }
@@ -330,7 +331,7 @@ html, body {
   text-decoration: none;
   color: var(--text-soft);
   padding: 10px 16px;
-  border-radius: 30px;
+  border-radius: 3px;
   border: 1px solid rgba(150, 170, 220, 0.18);
   background: rgba(8, 10, 26, 0.45);
   backdrop-filter: blur(4px);
@@ -370,38 +371,13 @@ html, body {
 }
 @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 
-/* ---------- Title text ---------- */
-.galaxy-intro-text {
-  position: fixed;
-  top: 38px;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  z-index: 5;
-  pointer-events: none;
-}
-.galaxy-intro-text h1 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: 1.1rem;
-  letter-spacing: 0.7em;
-  text-indent: 0.7em;
-  color: rgba(234, 241, 255, 0.5);
-}
-.galaxy-intro-text p {
-  margin: 8px 0 0;
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
-  color: var(--text-faint);
-}
-
-/* ---------- A live-viewer ship ---------- */
+/* ---------- A live-viewer ship: a distant, sleek dart ---------- */
 .ship {
   position: absolute;
-  width: 26px;
-  height: 26px;
-  margin: -13px 0 0 -13px;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  opacity: 0.75;
   transition: left 9s linear, top 9s linear, opacity 0.6s ease;
   will-change: left, top;
 }
@@ -409,15 +385,15 @@ html, body {
   display: block;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 5px rgba(150, 200, 255, 0.55));
+  filter: drop-shadow(0 0 3px rgba(170, 200, 240, 0.4));
 }
 .ship .engine {
-  animation: engine-glow 1.6s ease-in-out infinite;
+  animation: engine-glow 2.4s ease-in-out infinite;
   transform-origin: center;
 }
 @keyframes engine-glow {
-  0%, 100% { opacity: 0.5; }
-  50%      { opacity: 1; }
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.9; }
 }
 
 /* ---------- The wormhole overlay (created by galaxy.js) ---------- */
@@ -432,7 +408,6 @@ html, body {
 @media (max-width: 760px) {
   .helix-img { width: 90px; height: 90px; }
   .helix-word { font-size: 1.1rem; letter-spacing: 0.4em; text-indent: 0.4em; }
-  .galaxy-intro-text p { display: none; }
   .guide-text { display: none; }
   .nebula-name { font-size: 0.95rem; }
   .nebula-tagline { display: none; }
