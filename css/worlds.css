@@ -1,11 +1,10 @@
 /* ===========================================================
-   worlds.css — The five creative worlds.
-   The space theme ends at the wormhole: each world is its own
-   place. Film = a screening room, Fashion = an editorial
-   archive, Painting = a gallery after hours, Coding = a
-   terminal, Photography = a darkroom contact sheet.
-
-   Shared skeleton first, then one themed section per world.
+   worlds.css — The five creative worlds + the work page.
+   The space theme ends at the wormhole. Four worlds are full
+   SCENES you stand inside (film = projection room, photography
+   = darkroom board, fashion = dark scrapbook, painting = studio
+   with easels); coding stays a terminal. Every object in a
+   scene is a link to that work's page.
    =========================================================== */
 
 * { box-sizing: border-box; }
@@ -18,6 +17,10 @@ body.world {
   animation: world-fade-in 0.9s ease forwards;
 }
 @keyframes world-fade-in { to { opacity: 1; } }
+
+/* exit fade, played by worlds.js before travelling to a work */
+body.world.leaving { animation: world-fade-out 0.48s ease forwards; }
+@keyframes world-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
 /* ---------- Return-to-galaxy button (recoloured per theme) ---------- */
 .return-link {
@@ -38,17 +41,60 @@ body.world {
 }
 .return-link:hover { transform: translateX(-3px); }
 
-/* ---------- Shared header / grid skeleton ---------- */
+/* ---------- Scene scaffolding (film / photo / fashion / painting) ---------- */
+body.scene {
+  overflow: hidden;
+  height: 100vh;
+}
+.scene-title {
+  position: absolute;
+  top: 82px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 6;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.scene-title h1 {
+  margin: 6px 0 0;
+  font-weight: 300;
+  font-size: clamp(1.8rem, 4.5vw, 2.7rem);
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+}
+.world-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+}
+/* scattered, clickable objects */
+.scene-item {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.35s ease, filter 0.35s ease, box-shadow 0.35s ease;
+}
+.board .scene-item,
+.scrapbook .scene-item,
+.studio .scene-item {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: rotate(var(--r, 0deg));
+}
+.board .scene-item:hover,
+.scrapbook .scene-item:hover {
+  transform: rotate(0deg) translateY(-8px);
+  z-index: 8;
+}
+
+/* ---------- Header/grid skeleton (still used by the coding world) ---------- */
 .world-header {
   position: relative;
   text-align: center;
   padding: 130px 24px 48px;
-}
-.world-kicker {
-  margin: 0 0 16px;
-  font-size: 0.74rem;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
 }
 .world-header h1 {
   margin: 0;
@@ -57,6 +103,7 @@ body.world {
   letter-spacing: 0.14em;
   text-indent: 0.14em;
 }
+.world-header .world-kicker { margin-bottom: 16px; }
 .world-tagline {
   margin: 12px 0 0;
   font-size: 0.82rem;
@@ -69,7 +116,6 @@ body.world {
   font-size: 1.1rem;
   line-height: 1.75;
 }
-
 .projects {
   position: relative;
   max-width: 1060px;
@@ -91,7 +137,6 @@ body.world {
 .project-body { padding: 16px 18px 20px; }
 .project-body h3 { margin: 0 0 8px; font-weight: 500; font-size: 1.2rem; }
 .project-body p { margin: 0; font-size: 0.86rem; line-height: 1.6; }
-
 .placeholder-note {
   max-width: 1060px;
   margin: 0 auto 60px;
@@ -103,8 +148,8 @@ body.world {
 }
 
 /* ===========================================================
-   FILM — the screening room
-   Pure black, cinemascope bars, timecodes, one hard light.
+   FILM — the projection room
+   A big screen, an old projector, and reels to choose from.
    =========================================================== */
 body.world-film {
   --ink: #e8e4dc;
@@ -112,7 +157,7 @@ body.world-film {
   --accent: #c1121f;
   color: var(--ink);
   background:
-    radial-gradient(ellipse 55% 38% at 50% -6%, rgba(232, 228, 220, 0.07), transparent 70%),
+    radial-gradient(ellipse 55% 38% at 50% -6%, rgba(232, 228, 220, 0.06), transparent 70%),
     #0a0a0a;
 }
 /* cinemascope letterbox bars */
@@ -124,7 +169,7 @@ body.world-film::after {
   right: 0;
   height: 52px;
   background: #000;
-  z-index: 4;
+  z-index: 9;
   pointer-events: none;
 }
 body.world-film::before { top: 0; border-bottom: 1px solid #1c1c1c; }
@@ -137,171 +182,422 @@ body.world-film .return-link {
   font-family: ui-monospace, monospace;
 }
 body.world-film .return-link:hover { border-color: var(--accent); color: var(--ink); }
-body.world-film .world-kicker {
+body.world-film .world-kicker { font-family: ui-monospace, monospace; color: var(--dim); }
+body.world-film .scene-title { top: 76px; }
+body.world-film .scene-title h1 { color: #fff; font-weight: 500; letter-spacing: 0.2em; }
+
+.cinema { position: absolute; inset: 0; }
+
+/* the screen */
+.screen {
+  position: absolute;
+  top: 15vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(64vw, 820px);
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(165deg, #121212, #0b0b0b);
+  border: 2px solid #1e1e1e;
+  border-radius: 3px;
+  box-shadow:
+    0 0 70px rgba(232, 228, 220, 0.05),
+    inset 0 0 90px rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.screen-msg {
   font-family: ui-monospace, monospace;
-  color: var(--dim);
-}
-/* the blinking REC dot */
-body.world-film .world-kicker::after {
-  content: "";
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-left: 12px;
-  border-radius: 50%;
-  vertical-align: 1px;
-  background: var(--accent);
-  animation: rec-blink 1.6s steps(1) infinite;
-}
-@keyframes rec-blink { 50% { opacity: 0.15; } }
-body.world-film .world-header h1 {
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-indent: 0.04em;
-  font-size: clamp(3rem, 9vw, 6rem);
-  color: #fff;
-}
-body.world-film .world-tagline {
-  font-family: ui-monospace, monospace;
-  color: var(--accent);
-}
-body.world-film .world-intro { color: var(--dim); }
-/* production hairline under the header */
-body.world-film .world-header::after {
-  content: "A HELIX PRODUCTION";
-  display: block;
-  width: fit-content;
-  margin: 34px auto 0;
-  padding-top: 14px;
-  border-top: 1px solid #242424;
-  font-family: ui-monospace, monospace;
-  font-size: 0.62rem;
+  font-size: 0.66rem;
   letter-spacing: 0.5em;
   text-indent: 0.5em;
-  color: #4a4741;
+  color: #403d38;
+  animation: msg-breathe 4s ease-in-out infinite;
 }
-/* widescreen stills */
-body.world-film .project-card {
-  background: #060606;
-  border: 1px solid #1c1c1c;
+@keyframes msg-breathe { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* the beam: narrow at the projector, wide at the screen */
+.beam {
+  position: absolute;
+  top: calc(15vh + 4px);
+  bottom: 21vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(64vw, 820px);
+  clip-path: polygon(0 0, 100% 0, 52.5% 100%, 47.5% 100%);
+  background: linear-gradient(to bottom, rgba(240, 235, 220, 0.05), rgba(240, 235, 220, 0.12));
+  opacity: 0.55;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
 }
-body.world-film .project-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.8);
+
+/* the projector silhouette */
+.projector {
+  position: absolute;
+  bottom: 13vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 96px;
+  z-index: 3;
+  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.8));
+  pointer-events: none;
 }
-body.world-film .project-thumb {
-  aspect-ratio: 2.39 / 1;
+.proj-body {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  width: 114px;
+  height: 40px;
+  background: linear-gradient(#1d1d20, #131315);
+  border: 1px solid #29292d;
+  border-radius: 5px;
+}
+.proj-lens {
+  position: absolute;
+  bottom: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 14px;
+  background: #222226;
+  border: 1px solid #303036;
+  border-radius: 3px;
+  box-shadow: 0 -4px 12px rgba(240, 235, 220, 0.35);
+}
+.proj-reel {
+  position: absolute;
+  top: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #2e2e33;
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(232, 228, 220, 0.08), transparent 65%),
-    linear-gradient(170deg, #141414, #060606);
-  color: var(--dim);
-  font-family: ui-monospace, monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
-  border-bottom: 1px solid #1c1c1c;
+    radial-gradient(circle, #29292e 0 18%, #121214 19% 34%, #232327 35% 72%, #101012 73%);
 }
-body.world-film .project-body h3 { color: #fff; letter-spacing: 0.04em; }
-body.world-film .project-body p { color: var(--dim); }
-body.world-film .placeholder-note { color: var(--dim); }
+.proj-reel-a { left: 28px; }
+.proj-reel-b { left: 84px; }
+.proj-leg {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  height: 20px;
+  background: #1b1b1e;
+  transform-origin: top center;
+}
+.proj-leg-a { transform: translateX(-50%) rotate(20deg); }
+.proj-leg-b { transform: translateX(-50%) rotate(-20deg); }
+
+/* the reels — one per film */
+.reel-shelf {
+  position: absolute;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(34px, 7vw, 80px);
+  z-index: 5;
+}
+.reel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.reel-disc {
+  display: block;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 1px solid #2c2c31;
+  background:
+    conic-gradient(
+      rgba(0, 0, 0, 0.55) 0deg 18deg, transparent 18deg 54deg,
+      rgba(0, 0, 0, 0.55) 54deg 90deg, transparent 90deg 126deg,
+      rgba(0, 0, 0, 0.55) 126deg 162deg, transparent 162deg 198deg,
+      rgba(0, 0, 0, 0.55) 198deg 234deg, transparent 234deg 270deg,
+      rgba(0, 0, 0, 0.55) 270deg 306deg, transparent 306deg 342deg,
+      rgba(0, 0, 0, 0.55) 342deg 360deg
+    ),
+    radial-gradient(circle, #313136 0 12%, #0e0e10 13% 24%, #232327 25% 74%, #121215 75%);
+  transition: transform 0.5s ease, box-shadow 0.4s ease;
+}
+.reel:hover .reel-disc,
+.reel:focus-visible .reel-disc {
+  transform: rotate(40deg);
+  box-shadow: 0 0 26px rgba(193, 18, 31, 0.35);
+}
+.reel-label {
+  font-family: ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.24em;
+  color: var(--dim);
+  transition: color 0.3s ease;
+}
+.reel:hover .reel-label { color: var(--ink); }
+
+/* choosing a reel: it spins, the beam floods, the screen comes alive */
+.reel.chosen .reel-disc {
+  animation: reel-spin 0.7s linear infinite;
+  box-shadow: 0 0 30px rgba(193, 18, 31, 0.5);
+}
+@keyframes reel-spin { to { transform: rotate(360deg); } }
+body.projecting .beam {
+  opacity: 1;
+  background: linear-gradient(to bottom, rgba(240, 235, 220, 0.12), rgba(240, 235, 220, 0.3));
+}
+body.projecting .screen { animation: screen-flicker 1.15s steps(1) forwards; }
+body.projecting .screen-msg { display: none; }
+@keyframes screen-flicker {
+  0%   { background: #0b0b0b; }
+  10%  { background: #cfcabb; }
+  16%  { background: #151515; }
+  24%  { background: #e5e0d2; }
+  32%  { background: #101010; }
+  45%  { background: #efeade; }
+  60%  { background: #1a1a1a; }
+  72%, 100% { background: #f4efe2; box-shadow: 0 0 140px rgba(240, 235, 220, 0.45); }
+}
 
 /* ===========================================================
-   FASHION — the editorial archive
-   Near-black, bone serif, oxblood, hairline rules. No pins.
+   PHOTOGRAPHY — the darkroom board
+   Polaroids and negatives hanging under the safelight.
+   =========================================================== */
+body.world-photography {
+  --ink: #d8cfd0;
+  --dim: #82777a;
+  --accent: #c53a34;
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 65% 40% at 50% -5%, rgba(197, 58, 52, 0.16), transparent 70%),
+    radial-gradient(ellipse 90% 80% at 50% 115%, rgba(0, 0, 0, 0.65), transparent 70%),
+    linear-gradient(#110708, #0a0405);
+}
+body.world-photography .return-link {
+  color: var(--dim);
+  border: 1px solid #2c1a1b;
+  background: rgba(17, 7, 8, 0.85);
+  font-family: ui-monospace, monospace;
+}
+body.world-photography .return-link:hover { border-color: var(--accent); color: var(--ink); }
+body.world-photography .world-kicker { font-family: ui-monospace, monospace; color: var(--accent); }
+body.world-photography .scene-title h1 { color: #f4e9e9; text-shadow: 0 0 26px rgba(197, 58, 52, 0.35); }
+
+.board { position: absolute; inset: 0; }
+
+/* a hanging print */
+.polaroid {
+  width: clamp(150px, 16vw, 205px);
+  background: #e8e2d8;
+  padding: 9px 9px 0;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7);
+}
+.polaroid .photo {
+  display: block;
+  aspect-ratio: 1 / 1;
+  background:
+    radial-gradient(ellipse at 40% 35%, rgba(255, 255, 255, 0.16), transparent 55%),
+    linear-gradient(155deg, #4b4546, #221d1e);
+  filter: grayscale(0.65) contrast(1.05);
+}
+.polaroid .photo-b {
+  background:
+    radial-gradient(ellipse at 65% 60%, rgba(255, 255, 255, 0.13), transparent 55%),
+    linear-gradient(200deg, #55504e, #191515);
+}
+.polaroid .photo-c {
+  background:
+    linear-gradient(to bottom, #5c5755 0 42%, #2b2626 42.5% 100%);
+}
+.polaroid .photo-dark {
+  background: linear-gradient(170deg, #161213, #0b0809);
+}
+.polaroid .chin {
+  display: block;
+  padding: 10px 2px 12px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.22em;
+  text-align: center;
+  color: #4a4441;
+}
+/* the steel clip holding it up */
+.clip {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 15px;
+  background: linear-gradient(#b9bcc4, #787c86);
+  border-radius: 2px;
+  box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.4), 0 2px 5px rgba(0, 0, 0, 0.55);
+  z-index: 2;
+}
+.board .scene-item:hover { filter: brightness(1.08); }
+
+/* a strip of negatives */
+.filmstrip {
+  display: flex;
+  gap: 7px;
+  width: clamp(190px, 21vw, 258px);
+  padding: 13px 12px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 9px, rgba(60, 52, 54, 0.9) 9px 13px) 0 2px / 100% 5px no-repeat,
+    repeating-linear-gradient(90deg, transparent 0 9px, rgba(60, 52, 54, 0.9) 9px 13px) 0 calc(100% - 7px) / 100% 5px no-repeat,
+    #0d0a0b;
+  border: 1px solid #2a2426;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.7);
+}
+.fs-frame {
+  flex: 1;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(150deg, #4a4344, #241f20);
+  filter: grayscale(0.75) invert(0.82) contrast(0.9);
+  opacity: 0.85;
+}
+
+/* ===========================================================
+   FASHION — the dark scrapbook
+   Black paper, bone sketches, oxblood swatches, rough tape.
    =========================================================== */
 body.world-fashion {
   --ink: #e9e4da;
   --dim: #7d776c;
   --accent: #8e2438;
   color: var(--ink);
-  background: #121212;
-}
-/* a ghost season marker behind the header */
-body.world-fashion .world-header::before {
-  content: "F/W";
-  position: absolute;
-  top: 44px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: -1;
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-style: italic;
-  font-size: clamp(8rem, 26vw, 17rem);
-  line-height: 1;
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(233, 228, 218, 0.07);
-  pointer-events: none;
+  background: #101010;
 }
 body.world-fashion .return-link {
   color: var(--dim);
   border: 1px solid #2a2a2a;
-  background: rgba(18, 18, 18, 0.8);
+  background: rgba(16, 16, 16, 0.85);
 }
 body.world-fashion .return-link:hover { border-color: var(--ink); color: var(--ink); }
 body.world-fashion .world-kicker { color: var(--dim); }
-body.world-fashion .world-header h1 {
+body.world-fashion .scene-title h1 {
   font-family: "Cormorant Garamond", Georgia, serif;
-  font-weight: 400;
   font-style: italic;
-  letter-spacing: 0.06em;
-  color: var(--ink);
+  font-weight: 400;
+  letter-spacing: 0.1em;
 }
-body.world-fashion .world-tagline {
-  color: var(--accent);
-  padding: 14px 0;
-  margin: 18px auto 0;
-  width: min(360px, 70%);
-  border-top: 1px solid #2a2a2a;
-  border-bottom: 1px solid #2a2a2a;
-}
-body.world-fashion .world-intro {
-  color: var(--dim);
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: 1.3rem;
-}
-/* lookbook plates */
-body.world-fashion .project-card {
-  background: #171717;
-  border: 1px solid #262626;
-  counter-increment: look;
-}
-body.world-fashion .project-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(233, 228, 218, 0.45);
-}
-body.world-fashion .projects { counter-reset: look; }
-body.world-fashion .project-thumb {
-  position: relative;
-  aspect-ratio: 3 / 4;
-  background: linear-gradient(165deg, #202020, #101010);
-  color: transparent; /* the HTML label is replaced by the counter below */
-  border-bottom: 1px solid #262626;
-}
-body.world-fashion .project-thumb::after {
-  content: "Look " counter(look, decimal-leading-zero);
+
+.scrapbook {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background:
+    repeating-linear-gradient(0deg, rgba(233, 228, 218, 0.012) 0 1px, transparent 1px 4px),
+    radial-gradient(ellipse 90% 80% at 50% 50%, #161616, #0d0d0d);
+}
+/* the page edges of the open book */
+.scrapbook::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border: 1px solid rgba(233, 228, 218, 0.07);
+  pointer-events: none;
+}
+.page-gutter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 90px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.6), transparent);
+  pointer-events: none;
+}
+
+/* a fabric swatch */
+.swatch { width: clamp(150px, 15vw, 195px); }
+.swatch .fabric {
+  display: block;
+  height: 118px;
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 4px),
+    linear-gradient(135deg, #6d1c2a, #481220);
+  box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.45), 0 12px 26px rgba(0, 0, 0, 0.6);
+  clip-path: polygon(0 0, 100% 0, 100% 94%, 92% 100%, 78% 96%, 62% 100%, 45% 96%, 28% 100%, 12% 96%, 0 100%);
+}
+.swatch .fabric-alt {
+  background:
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.28) 0 2px, transparent 2px 6px),
+    linear-gradient(150deg, #2e2c2f, #1b191c);
+}
+/* a bone sketch card */
+.sketch { width: clamp(160px, 16vw, 210px); background: #e9e4da; padding: 12px; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.65); }
+.sketch .sketch-lines {
+  display: block;
+  height: 128px;
+  background:
+    linear-gradient(to right, transparent 49.4%, #2b2622 49.4% 50.6%, transparent 50.6%) 0 0 / 100% 62%no-repeat,
+    linear-gradient(105deg, transparent 46%, #2b2622 46% 46.8%, transparent 46.8%) 0 100% / 100% 48% no-repeat,
+    linear-gradient(75deg, transparent 52%, #2b2622 52% 52.8%, transparent 52.8%) 0 100% / 100% 48% no-repeat,
+    #e9e4da;
+}
+.sketch .sketch-lines-alt {
+  background:
+    linear-gradient(95deg, transparent 30%, #2b2622 30% 30.7%, transparent 30.7%),
+    linear-gradient(85deg, transparent 68%, #2b2622 68% 68.7%, transparent 68.7%),
+    linear-gradient(to bottom, transparent 55%, rgba(142, 36, 56, 0.5) 55% 57%, transparent 57%),
+    #e9e4da;
+}
+/* rough translucent tape */
+.tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 74px;
+  height: 22px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: rgba(233, 228, 218, 0.13);
+  border-left: 1px solid rgba(233, 228, 218, 0.07);
+  border-right: 1px solid rgba(233, 228, 218, 0.07);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  z-index: 2;
+}
+.tape-corner { left: -16px; top: -6px; transform: rotate(-42deg); }
+/* labels */
+.piece-tag {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.6rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--dim);
+  transition: color 0.3s ease;
+}
+.sketch .piece-tag {
   font-family: "Cormorant Garamond", Georgia, serif;
   font-style: italic;
-  font-size: 2rem;
-  color: rgba(233, 228, 218, 0.28);
-  letter-spacing: 0.08em;
+  font-size: 1.02rem;
+  text-transform: none;
+  letter-spacing: 0.06em;
+  color: #4a443c;
 }
-body.world-fashion .project-body h3 {
+.scene-item:hover .piece-tag { color: var(--ink); }
+.sketch:hover .piece-tag { color: #2b2622; }
+/* handwritten margin notes */
+.annotation {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: rotate(var(--r, 0deg));
   font-family: "Cormorant Garamond", Georgia, serif;
-  font-weight: 400;
-  font-size: 1.5rem;
-  color: var(--ink);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: rgba(233, 228, 218, 0.38);
+  pointer-events: none;
 }
-body.world-fashion .project-body p { color: var(--dim); }
-body.world-fashion .placeholder-note { color: var(--dim); }
 
 /* ===========================================================
-   PAINTING — the gallery after hours
-   Charcoal walls, picture lights, one raw smear of red.
+   PAINTING — the studio, after hours
+   Easels standing on the floor, each under a picture light.
    =========================================================== */
 body.world-painting {
   --ink: #e6e0d3;
@@ -320,78 +616,98 @@ body.world-painting .return-link {
 }
 body.world-painting .return-link:hover { border-color: var(--ink); color: var(--ink); }
 body.world-painting .world-kicker { color: var(--dim); }
-body.world-painting .world-header h1 {
+body.world-painting .scene-title h1 {
   font-family: "Cormorant Garamond", Georgia, serif;
   font-weight: 400;
-  color: var(--ink);
-  position: relative;
-  display: inline-block;
+  letter-spacing: 0.12em;
 }
-/* a raw, oxidized smear behind the title */
-body.world-painting .world-header h1::before {
-  content: "";
+
+.studio { position: absolute; inset: 0; }
+.floor {
   position: absolute;
-  left: -8%;
-  right: -8%;
-  bottom: 0.04em;
-  height: 0.46em;
-  z-index: -1;
-  background: linear-gradient(90deg, rgba(180, 58, 38, 0), rgba(180, 58, 38, 0.55) 14%, rgba(150, 40, 28, 0.5) 86%, rgba(180, 58, 38, 0));
-  border-radius: 42% 58% 52% 48% / 62% 38% 58% 42%;
-  transform: skewX(-10deg) rotate(-0.8deg);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22vh;
+  background: linear-gradient(#15130f, #1e1a15);
+  border-top: 1px solid rgba(230, 224, 211, 0.08);
 }
-body.world-painting .world-tagline { color: var(--dim); }
-body.world-painting .world-intro {
-  color: var(--dim);
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: 1.3rem;
+
+/* an easel holding one work */
+.studio .scene-item.easel {
+  top: auto;
+  bottom: 12vh;
+  width: 200px;
+  height: 290px;
+  transform: scale(var(--s, 1));
+  transform-origin: bottom center;
 }
-/* works hung on the dark wall, each under its own picture light */
-body.world-painting .project-card {
-  position: relative;
-  background: #0d0c0a;
-  border: 1px solid #2b2823;
-  padding: 12px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+.studio .scene-item.easel:hover {
+  transform: scale(var(--s, 1)) translateY(-8px);
+  z-index: 8;
 }
-body.world-painting .project-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(230, 224, 211, 0.4);
-}
-/* the picture light: a warm pool falling from above the frame */
-body.world-painting .project-card::before {
-  content: "";
+.easel-light {
   position: absolute;
-  top: 0;
-  left: 8%;
-  right: 8%;
-  height: 55%;
-  background: radial-gradient(ellipse 75% 90% at 50% -30%, rgba(240, 200, 130, 0.16), transparent 70%);
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 230px;
+  height: 170px;
+  background: radial-gradient(ellipse 60% 70% at 50% 0%, rgba(240, 200, 130, 0.15), transparent 70%);
   pointer-events: none;
 }
-body.world-painting .project-thumb {
+.easel-canvas {
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 148px;
+  height: 118px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border: 6px solid #0d0c0a;
+  outline: 1px solid #2b2823;
   background:
-    radial-gradient(circle 52px at 28% 42%, rgba(150, 40, 28, 0.5), transparent 72%),
-    radial-gradient(circle 44px at 66% 60%, rgba(40, 70, 110, 0.42), transparent 72%),
-    radial-gradient(circle 36px at 54% 28%, rgba(190, 140, 40, 0.35), transparent 72%),
+    radial-gradient(circle 48px at 30% 40%, rgba(150, 40, 28, 0.5), transparent 72%),
+    radial-gradient(circle 42px at 66% 60%, rgba(40, 70, 110, 0.42), transparent 72%),
+    radial-gradient(circle 34px at 54% 26%, rgba(190, 140, 40, 0.35), transparent 72%),
     #1b1815;
-  color: rgba(230, 224, 211, 0.5);
-  font-family: "Cormorant Garamond", Georgia, serif;
-  letter-spacing: 0.3em;
-  border: 1px solid #2b2823;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+  transition: filter 0.35s ease;
+  z-index: 2;
 }
-body.world-painting .project-body h3 {
-  color: var(--ink);
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-weight: 400;
-  font-size: 1.4rem;
+.easel-canvas.canvas-b {
+  background:
+    radial-gradient(circle 54px at 60% 35%, rgba(200, 170, 90, 0.4), transparent 72%),
+    radial-gradient(circle 40px at 30% 65%, rgba(90, 40, 90, 0.4), transparent 72%),
+    #1b1815;
 }
-body.world-painting .project-body p { color: var(--dim); }
-body.world-painting .placeholder-note { color: var(--dim); }
+.easel-canvas.canvas-dark { background: #14110e; }
+.canvas-tag {
+  padding-bottom: 8px;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 0.88rem;
+  letter-spacing: 0.2em;
+  color: rgba(230, 224, 211, 0.55);
+}
+.easel:hover .easel-canvas { filter: brightness(1.18); }
+.easel-leg {
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  width: 4px;
+  height: 244px;
+  background: #221f19;
+  border-radius: 2px;
+  transform-origin: top center;
+}
+.easel-leg.leg-a { transform: translateX(-50%) rotate(10deg); }
+.easel-leg.leg-b { transform: translateX(-50%) rotate(-10deg); }
+.easel-leg.leg-c { transform: translateX(-50%); height: 232px; background: #1a1712; z-index: 0; }
 
 /* ===========================================================
-   CODING — the terminal
-   A dark shell session. Everything monospace, green on black.
+   CODING — the terminal (unchanged; the benchmark)
    =========================================================== */
 body.world-coding {
   --ink: #c9d6cf;
@@ -419,7 +735,6 @@ body.world-coding .world-header h1 {
   text-shadow: 0 0 18px rgba(70, 230, 160, 0.35);
 }
 body.world-coding .world-tagline { color: var(--ink); }
-/* blinking block cursor after the tagline */
 body.world-coding .world-tagline::after {
   content: "";
   display: inline-block;
@@ -432,7 +747,6 @@ body.world-coding .world-tagline::after {
 }
 @keyframes cursor-blink { 50% { opacity: 0; } }
 body.world-coding .world-intro { color: var(--dim); font-size: 1rem; }
-/* terminal-window cards */
 body.world-coding .project-card {
   background: #10161a;
   border: 1px solid #1e2a30;
@@ -441,7 +755,6 @@ body.world-coding .project-card {
   padding-top: 34px;
   position: relative;
 }
-/* window title bar with traffic-light dots */
 body.world-coding .project-card::before {
   content: "";
   position: absolute;
@@ -481,98 +794,103 @@ body.world-coding .project-body h3::before { content: "// "; color: var(--dim); 
 body.world-coding .project-body p { color: var(--dim); font-size: 0.82rem; }
 
 /* ===========================================================
-   PHOTOGRAPHY — the contact sheet
-   Safelight red over black; frames, registration marks.
+   WORK — the placeholder page for a single piece
    =========================================================== */
-body.world-photography {
-  --ink: #d8cfd0;
-  --dim: #82777a;
-  --accent: #c53a34;
-  color: var(--ink);
-  background:
-    radial-gradient(ellipse 65% 40% at 50% -5%, rgba(197, 58, 52, 0.15), transparent 70%),
-    linear-gradient(#110708, #0a0405);
+body.work {
+  --accent: #8fb4ff;
+  background: #060608;
+  color: #cfd6e6;
 }
-body.world-photography .return-link {
-  color: var(--dim);
-  border: 1px solid #2c1a1b;
-  background: rgba(17, 7, 8, 0.85);
-  font-family: ui-monospace, monospace;
+body.work .return-link {
+  color: #9aa2b8;
+  border: 1px solid #23283a;
+  background: rgba(6, 6, 8, 0.8);
 }
-body.world-photography .return-link:hover { border-color: var(--accent); color: var(--ink); }
-body.world-photography .world-kicker {
+body.work .return-link:hover { border-color: var(--accent); color: #fff; }
+.work-stage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 24px;
+}
+.work-kicker {
+  margin: 0;
   font-family: ui-monospace, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.44em;
+  text-indent: 0.44em;
+  text-transform: uppercase;
   color: var(--accent);
 }
-body.world-photography .world-header h1 {
+.work-stage h1 {
+  margin: 18px 0 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-weight: 300;
-  color: #f4e9e9;
-  text-shadow: 0 0 26px rgba(197, 58, 52, 0.35);
+  font-size: clamp(2.4rem, 7vw, 4.4rem);
+  color: #fff;
 }
-body.world-photography .world-tagline {
-  font-family: ui-monospace, monospace;
-  color: var(--dim);
+.work-stage h1::after {
+  content: "";
+  display: block;
+  width: 70px;
+  height: 1px;
+  margin: 30px auto 0;
+  background: var(--accent);
 }
-body.world-photography .world-intro { color: var(--dim); }
-/* contact-sheet frames */
-body.world-photography .project-card {
-  position: relative;
-  background: #0b0708;
-  border: 1px solid rgba(216, 207, 208, 0.28);
-  padding: 10px;
-  counter-increment: frame;
+.work-soon {
+  margin: 26px 0 0;
+  font-size: 0.86rem;
+  letter-spacing: 0.12em;
+  color: #6c7288;
 }
-body.world-photography .projects { counter-reset: frame; }
-body.world-photography .project-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(216, 207, 208, 0.6);
-}
-/* frame number, like the edge markings on film */
-body.world-photography .project-card::before {
-  content: "FRM " counter(frame, decimal-leading-zero) "A";
-  position: absolute;
-  top: -19px;
-  left: 0;
-  font-family: ui-monospace, monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.28em;
-  color: rgba(216, 207, 208, 0.4);
-}
-/* registration cross in the top-right corner */
-body.world-photography .project-card::after {
-  content: "+";
-  position: absolute;
-  top: -24px;
-  right: 0;
-  font-family: ui-monospace, monospace;
-  font-size: 0.8rem;
-  color: rgba(197, 58, 52, 0.5);
-}
-body.world-photography .project-thumb {
-  background:
-    radial-gradient(ellipse at 45% 40%, rgba(255, 255, 255, 0.10), transparent 60%),
-    linear-gradient(160deg, #2e2a29, #141011);
-  color: rgba(216, 207, 208, 0.45);
-  font-family: ui-monospace, monospace;
-  font-size: 0.78rem;
-  filter: grayscale(0.4);
-}
-body.world-photography .project-body h3 { color: var(--ink); font-size: 1.05rem; letter-spacing: 0.04em; }
-body.world-photography .project-body p { color: var(--dim); }
-body.world-photography .placeholder-note { color: var(--dim); }
 
-/* ---------- Smaller screens ---------- */
-@media (max-width: 600px) {
-  .world-header { padding-top: 104px; }
-  .projects { gap: 26px; }
-  body.world-film::before, body.world-film::after { height: 34px; }
-  body.world-film .return-link { top: 50px; }
+/* ---------- Smaller screens: scenes become loose stacks ---------- */
+@media (max-width: 700px) {
+  body.scene { overflow-y: auto; height: auto; min-height: 100vh; }
+  .scene-title { position: static; transform: none; padding: 104px 20px 8px; white-space: normal; }
+  .board, .scrapbook, .studio {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 38px;
+    padding: 22px 20px 80px;
+  }
+  .board .scene-item,
+  .scrapbook .scene-item,
+  .studio .scene-item {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: rotate(var(--r, 0deg));
+  }
+  .studio .scene-item.easel { bottom: auto; transform: none; }
+  .annotation, .page-gutter, .floor { display: none; }
+  .scrapbook::before { display: none; }
+  /* film: simple stack — screen, then the reels */
+  .cinema {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 34px;
+    padding: 14px 16px 90px;
+  }
+  .screen { position: static; transform: none; width: 92vw; }
+  .beam, .projector { display: none; }
+  .reel-shelf { position: static; transform: none; flex-wrap: wrap; justify-content: center; gap: 30px; }
+  body.world-film::before, body.world-film::after { height: 30px; }
+  body.world-film .return-link { top: 46px; }
+  body.world-film .scene-title { padding-top: 96px; }
 }
 
 /* respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
   body.world { animation-duration: 0.01s; }
   body.world-coding .world-tagline::after,
-  body.world-film .world-kicker::after { animation: none; }
-  .project-card, .project-card:hover { transform: none !important; }
+  .screen-msg { animation: none; }
+  .scene-item, .scene-item:hover, .reel-disc { transition: none; }
 }

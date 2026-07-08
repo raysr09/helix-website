@@ -5,47 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#110708" />
   <title>Photography — HELIX</title>
-  <meta name="description" content="Photography by Helix — a contact sheet developing under the safelight." />
+  <meta name="description" content="Photography by Helix — prints hanging on the darkroom board." />
   <link rel="icon" href="../images/helix-placeholder.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/worlds.css" />
 </head>
-<body class="world world-photography">
+<body class="world world-photography scene">
   <a href="../index.html" class="return-link">&#9666;&nbsp; Return to the Galaxy</a>
 
-  <header class="world-header">
-    <p class="world-kicker">Safelight On</p>
+  <header class="scene-title">
+    <p class="world-kicker">Darkroom &mdash; safelight on</p>
     <h1>PHOTOGRAPHY</h1>
-    <p class="world-tagline">Frozen Time</p>
-    <p class="world-intro">Exposed, developed, fixed. What the light left behind.</p>
   </header>
 
-  <section class="projects">
-    <article class="project-card">
-      <div class="project-thumb">EXP 400 / PUSH +1</div>
-      <div class="project-body">
-        <h3>Series I</h3>
-        <p>A placeholder for your first photo series. Add a cover image, a title and a short caption.</p>
-      </div>
-    </article>
-    <article class="project-card">
-      <div class="project-thumb">EXP 100 / 1:1.4</div>
-      <div class="project-body">
-        <h3>Single Frame</h3>
-        <p>One photograph that stands on its own. Swap in your own shot when ready.</p>
-      </div>
-    </article>
-    <article class="project-card">
-      <div class="project-thumb">UNDEVELOPED</div>
-      <div class="project-body">
-        <h3>Coming Soon</h3>
-        <p>Still in the tray. New frames surface here as the image comes up.</p>
-      </div>
-    </article>
-  </section>
+  <div class="board">
+    <a class="scene-item polaroid" style="--x:14%; --y:26%; --r:-5deg"
+       href="work.html?from=photography&amp;title=Series%20I">
+      <span class="clip" aria-hidden="true"></span>
+      <span class="photo" aria-hidden="true"></span>
+      <span class="chin">SERIES I &mdash; EXP 400</span>
+    </a>
 
-  <p class="placeholder-note">These are placeholders. Ask Claude to add your real photography whenever you're ready.</p>
+    <a class="scene-item polaroid" style="--x:38%; --y:48%; --r:3deg"
+       href="work.html?from=photography&amp;title=Single%20Frame">
+      <span class="clip" aria-hidden="true"></span>
+      <span class="photo photo-b" aria-hidden="true"></span>
+      <span class="chin">SINGLE FRAME &mdash; 1:1.4</span>
+    </a>
+
+    <a class="scene-item polaroid" style="--x:63%; --y:22%; --r:6deg"
+       href="work.html?from=photography&amp;title=Night%20Walks">
+      <span class="clip" aria-hidden="true"></span>
+      <span class="photo photo-c" aria-hidden="true"></span>
+      <span class="chin">NIGHT WALKS &mdash; PUSH +2</span>
+    </a>
+
+    <a class="scene-item polaroid" style="--x:80%; --y:56%; --r:-4deg"
+       href="work.html?from=photography&amp;title=Coming%20Soon">
+      <span class="clip" aria-hidden="true"></span>
+      <span class="photo photo-dark" aria-hidden="true"></span>
+      <span class="chin">UNDEVELOPED</span>
+    </a>
+
+    <!-- a strip of negatives, also a work -->
+    <a class="scene-item filmstrip" style="--x:32%; --y:14%; --r:8deg"
+       href="work.html?from=photography&amp;title=Contact%20Sheet">
+      <span class="fs-frame" aria-hidden="true"></span>
+      <span class="fs-frame" aria-hidden="true"></span>
+      <span class="fs-frame" aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <script src="../js/worlds.js" defer></script>
 </body>
 </html>

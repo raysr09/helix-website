@@ -149,6 +149,61 @@ html, body {
   to { stroke-dashoffset: 0; }
 }
 
+/* a touched secret star flares briefly (fires on any star — tells nothing) */
+.secret-star.flare::before {
+  animation: star-flare 0.55s ease-out;
+}
+@keyframes star-flare {
+  0%   { transform: translate(-50%, -50%) scale(1);   box-shadow: 0 0 4px rgba(200, 220, 255, 0.7); }
+  35%  { transform: translate(-50%, -50%) scale(3.4); box-shadow: 0 0 20px rgba(215, 235, 255, 0.95); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1);   box-shadow: 0 0 4px rgba(200, 220, 255, 0.7); }
+}
+
+/* the gleam that sweeps down the drawn blade */
+.constellation-gleam {
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  fill: none;
+  filter: drop-shadow(0 0 10px rgba(220, 240, 255, 1));
+}
+
+/* the strike: a slash of light opens the way to the door */
+.slash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+}
+.slash-overlay::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160vmax;
+  height: 2px;
+  background: #fff;
+  box-shadow: 0 0 34px rgba(200, 225, 255, 0.95);
+  transform: translate(-50%, -50%) rotate(-35deg) scaleX(0);
+  animation: slash-cut 0.32s ease-out forwards;
+}
+@keyframes slash-cut {
+  to { transform: translate(-50%, -50%) rotate(-35deg) scaleX(1); }
+}
+.slash-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  animation: slash-flash 0.55s ease 0.26s forwards;
+}
+@keyframes slash-flash {
+  0%   { opacity: 0; background: #fff; }
+  30%  { opacity: 0.9; background: #fff; }
+  100% { opacity: 1; background: #000; }
+}
+
 /* ---------- Nebula worlds (built by galaxy.js) ---------- */
 .nebula-layer {
   position: absolute;

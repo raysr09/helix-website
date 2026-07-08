@@ -5,47 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#171512" />
   <title>Painting — HELIX</title>
-  <meta name="description" content="Painting by Helix — pigment and pressure in the gallery after hours." />
+  <meta name="description" content="Painting by Helix — easels standing in the studio after hours." />
   <link rel="icon" href="../images/helix-placeholder.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/worlds.css" />
 </head>
-<body class="world world-painting">
+<body class="world world-painting scene">
   <a href="../index.html" class="return-link">&#9666;&nbsp; Return to the Galaxy</a>
 
-  <header class="world-header">
-    <p class="world-kicker">After Hours</p>
+  <header class="scene-title">
+    <p class="world-kicker">The Studio &mdash; after hours</p>
     <h1>Painting</h1>
-    <p class="world-tagline">Worlds in Pigment</p>
-    <p class="world-intro">The visitors have gone; the work stays lit. Pigment, pressure, and second attempts on charcoal walls.</p>
   </header>
 
-  <section class="projects">
-    <article class="project-card">
-      <div class="project-thumb">No. I</div>
-      <div class="project-body">
-        <h3>Untitled I</h3>
-        <p>A placeholder for your first painting. Add an image, a title and a note on medium or intent.</p>
-      </div>
-    </article>
-    <article class="project-card">
-      <div class="project-thumb">Study</div>
-      <div class="project-body">
-        <h3>Study</h3>
-        <p>A sketch or colour study. Swap in your own work when you're ready to show it.</p>
-      </div>
-    </article>
-    <article class="project-card">
-      <div class="project-thumb">Unhung</div>
-      <div class="project-body">
-        <h3>Coming Soon</h3>
-        <p>Still drying in the back room. It goes on the wall when it's earned it.</p>
-      </div>
-    </article>
-  </section>
+  <div class="studio">
+    <div class="floor" aria-hidden="true"></div>
 
-  <p class="placeholder-note">These are placeholders. Ask Claude to add your real paintings whenever you're ready.</p>
+    <a class="scene-item easel" style="--x:20%; --s:0.92"
+       href="work.html?from=painting&amp;title=Untitled%20I">
+      <span class="easel-light" aria-hidden="true"></span>
+      <span class="easel-canvas"><span class="canvas-tag">No. I</span></span>
+      <span class="easel-leg leg-a" aria-hidden="true"></span>
+      <span class="easel-leg leg-b" aria-hidden="true"></span>
+      <span class="easel-leg leg-c" aria-hidden="true"></span>
+    </a>
+
+    <a class="scene-item easel" style="--x:48%; --s:1.06"
+       href="work.html?from=painting&amp;title=Study">
+      <span class="easel-light" aria-hidden="true"></span>
+      <span class="easel-canvas canvas-b"><span class="canvas-tag">Study</span></span>
+      <span class="easel-leg leg-a" aria-hidden="true"></span>
+      <span class="easel-leg leg-b" aria-hidden="true"></span>
+      <span class="easel-leg leg-c" aria-hidden="true"></span>
+    </a>
+
+    <a class="scene-item easel" style="--x:76%; --s:0.88"
+       href="work.html?from=painting&amp;title=Coming%20Soon">
+      <span class="easel-light" aria-hidden="true"></span>
+      <span class="easel-canvas canvas-dark"><span class="canvas-tag">Unhung</span></span>
+      <span class="easel-leg leg-a" aria-hidden="true"></span>
+      <span class="easel-leg leg-b" aria-hidden="true"></span>
+      <span class="easel-leg leg-c" aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <script src="../js/worlds.js" defer></script>
 </body>
 </html>

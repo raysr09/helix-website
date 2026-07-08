@@ -91,7 +91,19 @@
     const DURATION = 1000;
     const start = performance.now();
 
+    // Guarantee arrival: browsers pause animation frames in hidden tabs,
+    // so without this timer the tunnel could hang forever if the visitor
+    // switches tabs mid-journey.
+    let finished = false;
+    function finish() {
+      if (finished) return;
+      finished = true;
+      done();
+    }
+    setTimeout(finish, DURATION + 600);
+
     function frame(now) {
+      if (finished) return;
       const t = Math.min(1, (now - start) / DURATION);
       const accel = 1 + t * t * 14; // streaks accelerate hard toward the end
 
@@ -125,10 +137,20 @@
       ctx.fillStyle = flash;
       ctx.fillRect(0, 0, w, h);
 
-      if (t < 1) { requestAnimationFrame(frame); } else { done(); }
+      if (t < 1) { requestAnimationFrame(frame); } else { finish(); }
     }
     requestAnimationFrame(frame);
   }
+
+  // When the browser restores this page from its back-forward cache
+  // (e.g. the visitor pressed Back), it comes back frozen mid-wormhole:
+  // tunnel canvas still covering the screen, galaxy faded out. Reset it.
+  window.addEventListener("pageshow", (e) => {
+    if (!e.persisted) return;
+    document.querySelectorAll(".wormhole-canvas").forEach((c) => c.remove());
+    galaxy.classList.add("revealed");
+    travelling = false;
+  });
 
   build();
 })();

@@ -54,12 +54,22 @@
   }
 
   function onStarClick(id) {
+    // every secret star flares when touched — correct or not, so the
+    // feedback never gives the order away
+    flare(byId[id].el);
     if (SECRET_ORDER[progress] === id) {
       progress++;
       if (progress === SECRET_ORDER.length) reveal();
     } else {
-      progress = 0; // silent reset — no feedback, keeps the mystery intact
+      progress = 0; // wrong star: progress resets, the flare tells nothing
     }
+  }
+
+  function flare(el) {
+    el.classList.remove("flare");
+    void el.offsetWidth; // restart the animation on rapid re-clicks
+    el.classList.add("flare");
+    setTimeout(() => el.classList.remove("flare"), 620);
   }
 
   // A full fantasy-dagger silhouette, traced as one continuous outline:
@@ -114,6 +124,22 @@
     const R = center(byId.guardRight.el);
     const T = center(byId.tip.el);
 
+    // a steel gradient running the length of the blade
+    const defs = document.createElementNS(SVG_NS, "defs");
+    const grad = document.createElementNS(SVG_NS, "linearGradient");
+    grad.setAttribute("id", "dagger-steel");
+    grad.setAttribute("gradientUnits", "userSpaceOnUse");
+    grad.setAttribute("x1", P[0]); grad.setAttribute("y1", P[1]);
+    grad.setAttribute("x2", T[0]); grad.setAttribute("y2", T[1]);
+    [["0", "#ffffff"], ["0.45", "#cfe4ff"], ["1", "#7f9dc4"]].forEach(([o, c]) => {
+      const stop = document.createElementNS(SVG_NS, "stop");
+      stop.setAttribute("offset", o);
+      stop.setAttribute("stop-color", c);
+      grad.appendChild(stop);
+    });
+    defs.appendChild(grad);
+    svg.appendChild(defs);
+
     // Unit vector along the spine (pommel -> tip) and a perpendicular unit
     // vector for width — both derived from real geometry, so the shape's
     // proportions can't be stretched by viewport width/height separately.
@@ -139,6 +165,7 @@
     const blade = document.createElementNS(SVG_NS, "path");
     blade.setAttribute("d", d);
     blade.setAttribute("class", "constellation-line");
+    blade.style.stroke = "url(#dagger-steel)"; // inline so it beats the class colour
     svg.appendChild(blade);
     const outlineLength = blade.getTotalLength();
     blade.style.strokeDasharray = outlineLength;
@@ -160,13 +187,35 @@
     fuller.setAttribute("x2", cx2);
     fuller.setAttribute("y2", cy2);
     fuller.setAttribute("class", "constellation-line constellation-fuller");
+    fuller.style.stroke = "url(#dagger-steel)";
     fuller.style.strokeDasharray = fullerLength;
     fuller.style.strokeDashoffset = fullerLength;
     fuller.style.animation = `constellation-draw ${fullerDuration}s ease forwards ${fullerDelay}s`;
     svg.appendChild(fuller);
 
-    const totalDrawTime = fullerDelay + fullerDuration;
-    setTimeout(fadeAndGo, totalDrawTime * 1000 + 900);
+    // once drawn, a gleam sweeps down the blade...
+    const gleam = document.createElementNS(SVG_NS, "line");
+    gleam.setAttribute("x1", cx1);
+    gleam.setAttribute("y1", cy1);
+    gleam.setAttribute("x2", cx2);
+    gleam.setAttribute("y2", cy2);
+    gleam.setAttribute("class", "constellation-gleam");
+    gleam.style.strokeDasharray = `46 ${fullerLength + 46}`;
+    gleam.style.strokeDashoffset = fullerLength + 46;
+    svg.appendChild(gleam);
+    const gleamStart = (fullerDelay + fullerDuration + 0.05) * 1000;
+    gleam.animate(
+      [{ strokeDashoffset: fullerLength + 46 }, { strokeDashoffset: -46 }],
+      { duration: 620, delay: gleamStart, easing: "cubic-bezier(0.6, 0, 0.4, 1)", fill: "forwards" }
+    );
+
+    // ...and then the dagger strikes: a slash opens the way to the door
+    setTimeout(() => {
+      const slash = document.createElement("div");
+      slash.className = "slash-overlay";
+      document.body.appendChild(slash);
+      setTimeout(() => { window.location.href = "/admin/"; }, 850);
+    }, gleamStart + 650);
   }
 
   function fadeAndGo() {

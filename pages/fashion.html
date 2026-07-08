@@ -5,47 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#121212" />
   <title>Fashion — HELIX</title>
-  <meta name="description" content="Fashion by Helix — an editorial archive of lines, seams and decisions." />
+  <meta name="description" content="Fashion by Helix — a dark scrapbook of designs, fabrics and decisions." />
   <link rel="icon" href="../images/helix-placeholder.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/worlds.css" />
 </head>
-<body class="world world-fashion">
+<body class="world world-fashion scene">
   <a href="../index.html" class="return-link">&#9666;&nbsp; Return to the Galaxy</a>
 
-  <header class="world-header">
-    <p class="world-kicker">The Archive</p>
+  <header class="scene-title">
+    <p class="world-kicker">The Scrapbook</p>
     <h1>Fashion</h1>
-    <p class="world-tagline">Form in Motion</p>
-    <p class="world-intro">Silhouettes cut with intent. Lines, seams, and decisions made with a blade — nothing here is accidental.</p>
   </header>
 
-  <section class="projects">
-    <article class="project-card">
-      <div class="project-thumb">Look 01</div>
-      <div class="project-body">
-        <h3>Collection No. 1</h3>
-        <p>A placeholder for your first collection or piece. Add a photo, a name and the thinking behind it.</p>
-      </div>
-    </article>
-    <article class="project-card">
-      <div class="project-thumb">Look 02</div>
-      <div class="project-body">
-        <h3>Mood Board</h3>
-        <p>Inspirations, textures and references that shape a design. Swap in your own imagery.</p>
-      </div>
-    </article>
-    <article class="project-card">
-      <div class="project-thumb">Look 03</div>
-      <div class="project-body">
-        <h3>Coming Soon</h3>
-        <p>Still on the cutting table. New pieces enter the archive as they're finished.</p>
-      </div>
-    </article>
-  </section>
+  <div class="scrapbook">
+    <div class="page-gutter" aria-hidden="true"></div>
 
-  <p class="placeholder-note">These are placeholders. Ask Claude to add your real fashion work whenever you're ready.</p>
+    <a class="scene-item swatch" style="--x:16%; --y:30%; --r:-4deg"
+       href="work.html?from=fashion&amp;title=Collection%20No.%201">
+      <span class="tape" aria-hidden="true"></span>
+      <span class="fabric" aria-hidden="true"></span>
+      <span class="piece-tag">COLLECTION N&ordm;1</span>
+    </a>
+
+    <a class="scene-item sketch" style="--x:42%; --y:22%; --r:3deg"
+       href="work.html?from=fashion&amp;title=Mood%20Board">
+      <span class="tape tape-corner" aria-hidden="true"></span>
+      <span class="sketch-lines" aria-hidden="true"></span>
+      <span class="piece-tag">Mood Board</span>
+    </a>
+
+    <a class="scene-item swatch swatch-alt" style="--x:66%; --y:44%; --r:5deg"
+       href="work.html?from=fashion&amp;title=Look%20Studies">
+      <span class="tape" aria-hidden="true"></span>
+      <span class="fabric fabric-alt" aria-hidden="true"></span>
+      <span class="piece-tag">LOOK STUDIES</span>
+    </a>
+
+    <a class="scene-item sketch sketch-alt" style="--x:24%; --y:58%; --r:-7deg"
+       href="work.html?from=fashion&amp;title=Coming%20Soon">
+      <span class="tape" aria-hidden="true"></span>
+      <span class="sketch-lines sketch-lines-alt" aria-hidden="true"></span>
+      <span class="piece-tag">Unfinished</span>
+    </a>
+
+    <span class="annotation" style="--x:56%; --y:70%; --r:-3deg" aria-hidden="true">cut on the bias &mdash;</span>
+    <span class="annotation" style="--x:78%; --y:18%; --r:4deg" aria-hidden="true">oxblood, raw hem</span>
+  </div>
+
+  <script src="../js/worlds.js" defer></script>
 </body>
 </html>
