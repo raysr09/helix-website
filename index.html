@@ -61,7 +61,32 @@
       <span class="presence-dot"></span>
       <span id="presence-count">1</span> exploring now
     </div>
+
+    <!-- the beacon: who is Helix / signal back -->
+    <button class="beacon" id="beacon" type="button" title="Open transmission">
+      <span class="beacon-dot" aria-hidden="true"></span>
+      <span class="beacon-text">Transmission</span>
+    </button>
   </main>
+
+  <!-- the transmission: about + contact -->
+  <div class="transmission" id="transmission" hidden>
+    <div class="transmission-panel" role="dialog" aria-modal="true" aria-label="About Helix">
+      <div class="transmission-head">
+        <span class="transmission-title">&#9679; INCOMING TRANSMISSION &mdash; HELIX</span>
+        <button class="transmission-close" id="transmission-close" type="button">END &#10005;</button>
+      </div>
+      <div class="transmission-body">
+        <p class="tx-line">This is Helix &mdash; maker of films, garments, paintings, photographs and the occasional small machine. Five worlds, one galaxy, all under construction.</p>
+        <p class="tx-sub">signal back:</p>
+        <ul class="tx-links">
+          <li><a href="mailto:hello@example.com">email &mdash; hello@example.com</a></li>
+          <li><a href="https://github.com/raysr09" target="_blank" rel="noopener">github &mdash; raysr09</a></li>
+          <li><a href="#" rel="noopener">instagram &mdash; @yourhandle</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
   <!-- data + scripts (deferred; order matters: data first) -->
   <script src="data/planets.js" defer></script>
@@ -69,6 +94,7 @@
   <script src="js/galaxy.js" defer></script>
   <script src="js/intro.js" defer></script>
   <script src="js/secret.js" defer></script>
+  <script src="js/beacon.js" defer></script>
   <!-- presence.js loads the Supabase library by itself, and only
        once real keys have been added (demo mode needs nothing) -->
   <script src="js/presence.js" defer></script>
