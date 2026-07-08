@@ -47,10 +47,12 @@
     return div;
   }
 
-  // types a line out character by character (instant if reduced motion)
+  // types a line out character by character — instant for reduced motion,
+  // and instant in hidden tabs (browsers throttle timers there, which
+  // would stretch the boot to a crawl)
   function typeln(text, cls, speed) {
     return new Promise((resolve) => {
-      if (reduceMotion) { println(text, cls); resolve(); return; }
+      if (reduceMotion || document.hidden) { println(text, cls); resolve(); return; }
       const div = println("", cls);
       let i = 0;
       const tick = () => {
@@ -177,10 +179,11 @@
 
   /* ---------- boot ---------- */
   async function boot() {
+    const instant = reduceMotion || document.hidden;
     await typeln("> establishing uplink ...", "dim", 18);
-    await new Promise((r) => setTimeout(r, reduceMotion ? 0 : 260));
+    await new Promise((r) => setTimeout(r, instant ? 0 : 260));
     await typeln("> connection secured.", "dim", 18);
-    await new Promise((r) => setTimeout(r, reduceMotion ? 0 : 200));
+    await new Promise((r) => setTimeout(r, instant ? 0 : 200));
     await typeln("welcome aboard. type 'help' to begin — or tap a command below.");
     inputLine.hidden = false;
     booted = true;
