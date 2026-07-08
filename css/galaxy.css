@@ -484,6 +484,8 @@ html, body {
   background: rgba(2, 3, 10, 0.72);
   backdrop-filter: blur(3px);
 }
+/* our display:flex above would defeat the hidden attribute without this */
+.transmission[hidden] { display: none; }
 .transmission-panel {
   width: min(520px, 100%);
   background: #0a0c1c;
